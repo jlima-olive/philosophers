@@ -6,7 +6,7 @@
 #    By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/12 13:07:24 by jlima-so          #+#    #+#              #
-#    Updated: 2025/06/29 20:09:47 by jlima-so         ###   ########.fr        #
+#    Updated: 2025/07/03 19:02:14 by jlima-so         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,9 @@ BONUS_DIR=${PROJ}_bonus_dir/
 
 #OBJ_LIB=	${SRC_LIB:.c=.o}
 
-SRC_FILES=  $(wildcard ${SUBJ_DIR}*.c)
+SRC_FILES=  $(wildcard ${SUBJ_DIR}*.c) \
+			$(wildcard listas/*.c) \
+
 
 OBJ_FILES=	${SRC_FILES:.c=.o}
 
@@ -44,8 +46,7 @@ CC=cc
 
 AR=ar rcs
 
-CFLAGS= 
-#-Wall -Wextra -Werror
+CFLAGS= -pthread -g -Wall -Wextra -Werror 
 
 all: ${PROJ}
 

@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/07/03 20:40:27 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/07/04 15:42:02 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,16 +28,20 @@ typedef struct s_philo
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
+	int				talky_talk;
+	int				all_alive;
+	struct timeval	total_time;
 	pthread_mutex_t	start_banquet;
+	pthread_mutex_t	talky_talk_prot;
 }	t_philo;
 
 typedef struct s_list
 {
 	int				p_nbr;
+	int				fork;
 	struct s_list	*left;
 	struct s_list	*right;
-	pthread_mutex_t	fork;
-	pthread_mutex_t	talky_talk;
+	pthread_mutex_t	fork_prot;
 	t_philo			info;
 }	t_list;
 

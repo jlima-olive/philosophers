@@ -6,13 +6,13 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/07/04 13:15:47 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/07/04 18:00:21 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-t_list	*ft_lstnew(t_list *left, t_list *right, int nbr, t_philo info)
+t_list	*ft_lstnew(t_list *left, t_list *right, int nbr, t_info info)
 {
 	t_list			*new;
 

@@ -1,68 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo.c                                            :+:      :+:    :+:   */
+/*   previous_philo.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/07/04 18:14:58 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/07/04 17:15:15 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
 
-int	int_info(int ac, char **av, t_info *info)
-{
-	info->nbr_of_philosophers = ft_atoi(av[1]);
-	info->time_to_die = ft_atoi(av[2]) * 1000;
-	info->time_to_eat = ft_atoi(av[3]) * 1000;
-	info->time_to_sleep = ft_atoi(av[4]) * 1000;
-	info->notepme = -1;
-	if (ac > 5)
-		info->notepme = ft_atoi(av[5]);
-	info->talky_talk = 1;
-	info->all_alive = 1;
-	info->total_time = 0;
-	if (pthread_mutex_init(&info->start_banquet, NULL))
-		return (1);
-	if (pthread_mutex_init(&info->talky_talk_prot, NULL))
-		return (1);
-	return (0);
-}
 
-int	exit_message(t_info info)
-{
-	write(2, "invalid number of philosophers\n", \
-		(info.nbr_of_philosophers <= 0) * 32);
-	write(2, "invalid time to die\n", (info.time_to_die <= 0) * 21);
-	write(2, "invalid time to eat\n", (info.time_to_eat <= 0) * 21);
-	write(2, "invalid time to sleep\n", (info.time_to_sleep <= 0) * 23);
-	write(2, "invalid number of times each philosopher must eat \n", \
-		(info.notepme <= 0) * 52);
-	return ((info.nbr_of_philosophers <= 0) + (info.time_to_die <= 0) + \
-		(info.time_to_eat <= 0) + (info.time_to_sleep <= 0) + \
-		(info.notepme <= 0));
-}
-
-int	ft_eating(t_list *philo, unsigned long total_time, struct timeval last_time)
+int	ft_eating(t_list *philo, unsigned long long total_time, struct timeval last_time)
 {
 	struct timeval	time;
 
-	while (philo->fork == 0)
-	{
-		
-	}
-	pthread_mutex_lock(&philo->fork_prot);	
-	philo->fork = 0;
-	pthread_mutex_unlock(&philo->fork_prot);
-	while (philo->left->fork == 0)
+	while (philo->fork == 0 || philo->left->fork == 0)
 	{
 		
 	}
 	pthread_mutex_lock(&philo->left->fork_prot);
+	pthread_mutex_lock(&philo->fork_prot);	
+	philo->fork = 0;
 	philo->left->fork = 0;
+	pthread_mutex_unlock(&philo->fork_prot);
 	pthread_mutex_unlock(&philo->left->fork_prot);
 	while (philo->info.talky_talk == 0)
 	{
@@ -73,11 +37,12 @@ int	ft_eating(t_list *philo, unsigned long total_time, struct timeval last_time)
 	pthread_mutex_unlock(&philo->info.talky_talk_prot);
 	gettimeofday(&time, NULL);
 	total_time += (time.tv_usec - last_time.tv_usec);
-	printf("%lu %d is eating\n", total_time / 1000, philo->p_nbr);
+	// printf("%ld\n", time.tv_usec - last_time.tv_usec);
+	printf("numbers %llu %d is eating for %dms\n", total_time, philo->p_nbr, philo->info.time_to_eat);
 	usleep(philo->info.time_to_eat);
+	philo->info.talky_talk = 1;
 	philo->left->fork = 1;
 	philo->fork = 1;
-	philo->info.talky_talk = 1;
 	return (0);
 }
 
@@ -95,10 +60,11 @@ int	ft_sleeping(t_list *philo)
 
 void	*run_code(void *arg)
 {
-	int				ind;
 	t_list			*philo;
 	struct timeval	time;
 	struct timeval	last_time;
+	unsigned long long			total_time;
+	int				ind;
 
 	philo = (t_list *)arg;
 	if (philo->p_nbr != philo->info.nbr_of_philosophers)
@@ -110,23 +76,25 @@ void	*run_code(void *arg)
 	}
 	pthread_mutex_unlock(&philo->info.start_banquet);
 	gettimeofday(&last_time, NULL);
+	total_time = 0;
 	ind = 0;
 	while (1 && ++ind)
 	{
 		gettimeofday(&time, NULL);
-		philo->info.total_time += ((1000000 * (time.tv_usec < last_time.tv_usec) + time.tv_usec - last_time.tv_usec));
-		if (ft_eating(philo, philo->info.total_time, time))
+		total_time += (time.tv_usec - last_time.tv_usec);
+		// printf("%ld\n", time.tv_usec - last_time.tv_usec);
+		if (ft_eating(philo, total_time, time))
 			break ;
 		last_time = time;
-		
 		gettimeofday(&time, NULL);
-		philo->info.total_time += ((1000000 * (time.tv_usec < last_time.tv_usec) + time.tv_usec - last_time.tv_usec));
+		total_time += (time.tv_usec - last_time.tv_usec);
+		// printf("%ld\n", time.tv_usec - last_time.tv_usec);
 		if (ft_thinking(philo))
 			break ;
 		last_time = time;
-		
 		gettimeofday(&time, NULL);
-		philo->info.total_time += ((1000000 * (time.tv_usec < last_time.tv_usec) + time.tv_usec - last_time.tv_usec));
+		total_time += (time.tv_usec - last_time.tv_usec);
+		// printf("%ld\n", time.tv_usec - last_time.tv_usec);
 		if (ft_sleeping(philo))
 			break ;
 		last_time = time;
@@ -183,20 +151,43 @@ int	init_infosophers(t_info info)
 	return (free(nof), ft_lstclear(&philo, info.nbr_of_philosophers), 0);
 }
 
+int	exit_message(t_info philo)
+{
+	write(2, "invalid number of philosophers\n", \
+		(philo.nbr_of_philosophers <= 0) * 32);
+	write(2, "invalid time to die\n", (philo.time_to_die <= 0) * 21);
+	write(2, "invalid time to eat\n", (philo.time_to_eat <= 0) * 21);
+	write(2, "invalid time to sleep\n", (philo.time_to_sleep <= 0) * 23);
+	write(2, "invalid number of times each philosopher must eat \n", \
+		(philo.notepme <= 0) * 52);
+	return ((philo.nbr_of_philosophers <= 0) + (philo.time_to_die <= 0) + \
+		(philo.time_to_eat <= 0) + (philo.time_to_sleep <= 0) + \
+		(philo.notepme <= 0));
+}
+
 int	main(int ac, char **av)
 {
-	t_info	info;
+	t_info			info;
 
 	if (ac != 6)
 		return (write(2, "invalid number of arguments\n", 28));
-	if (int_info(ac, av, &info))
-		return (1);
+	info.nbr_of_philosophers = ft_atoi(av[1]);
+	info.time_to_die = ft_atoi(av[2]);
+	info.time_to_eat = ft_atoi(av[3]);
+	info.time_to_sleep = ft_atoi(av[4]);
+	info.notepme = ft_atoi(av[5]);
+	info.talky_talk = 1;
 	if (exit_message(info))
 		return (1);
 	if (pthread_mutex_init(&info.talky_talk_prot, NULL))
 		return (1);
 	if (pthread_mutex_init(&info.start_banquet, NULL))
 		return (1);
-	printf("nbr_of_philosophers:%d\ntime_to_die:%d\ntime_to_eat:%d\ntime_to_sleep:%d\nnotepme:%d\n\nstarting now\n", info.nbr_of_philosophers, info.time_to_die, info.time_to_eat, info.time_to_sleep, info.notepme);
 	init_infosophers(info);
 }
+
+// timestamp_in_ms X has taken a fork_prot
+// timestamp_in_ms X is eating
+// timestamp_in_ms X is sleeping
+// timestamp_in_ms X is thinking
+// timestamp_in_ms X died

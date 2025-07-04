@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/07/04 16:54:02 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/07/04 20:02:50 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #define __USE_XOPEN
-
 
 typedef struct s_info
 {
@@ -39,6 +38,7 @@ typedef struct s_list
 {
 	int				p_nbr;
 	int				fork;
+	int				ate;
 	struct s_list	*left;
 	struct s_list	*right;
 	pthread_mutex_t	fork_prot;

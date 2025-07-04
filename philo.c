@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/07/04 18:14:58 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/07/04 20:50:55 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,19 +50,15 @@ int	ft_eating(t_list *philo, unsigned long total_time, struct timeval last_time)
 {
 	struct timeval	time;
 
-	while (philo->fork == 0)
+	while (philo->fork == 0 || philo->left->fork == 0)
 	{
 		
 	}
 	pthread_mutex_lock(&philo->fork_prot);	
-	philo->fork = 0;
-	pthread_mutex_unlock(&philo->fork_prot);
-	while (philo->left->fork == 0)
-	{
-		
-	}
 	pthread_mutex_lock(&philo->left->fork_prot);
+	philo->fork = 0;
 	philo->left->fork = 0;
+	pthread_mutex_unlock(&philo->fork_prot);
 	pthread_mutex_unlock(&philo->left->fork_prot);
 	while (philo->info.talky_talk == 0)
 	{
@@ -73,7 +69,7 @@ int	ft_eating(t_list *philo, unsigned long total_time, struct timeval last_time)
 	pthread_mutex_unlock(&philo->info.talky_talk_prot);
 	gettimeofday(&time, NULL);
 	total_time += (time.tv_usec - last_time.tv_usec);
-	printf("%lu %d is eating\n", total_time / 1000, philo->p_nbr);
+	printf("%lu %d is eating\n", (total_time) / 1000, philo->p_nbr);
 	usleep(philo->info.time_to_eat);
 	philo->left->fork = 1;
 	philo->fork = 1;
@@ -101,30 +97,29 @@ void	*run_code(void *arg)
 	struct timeval	last_time;
 
 	philo = (t_list *)arg;
-	if (philo->p_nbr != philo->info.nbr_of_philosophers)
-		usleep(20);
-	else
-	{
-		pthread_mutex_lock(&philo->info.start_banquet);
-		usleep(20);
-	}
-	pthread_mutex_unlock(&philo->info.start_banquet);
+	// if (philo->p_nbr != philo->info.nbr_of_philosophers)
+	// 	usleep(200);
+	// else
+	// {
+	// 	pthread_mutex_lock(&philo->info.start_banquet);
+	// 	usleep(200);
+	// }
+	// pthread_mutex_unlock(&philo->info.start_banquet);
 	gettimeofday(&last_time, NULL);
 	ind = 0;
 	while (1 && ++ind)
 	{
 		gettimeofday(&time, NULL);
-		philo->info.total_time += ((1000000 * (time.tv_usec < last_time.tv_usec) + time.tv_usec - last_time.tv_usec));
+		philo->info.total_time += (time.tv_usec);
 		if (ft_eating(philo, philo->info.total_time, time))
 			break ;
 		last_time = time;
-		
 		gettimeofday(&time, NULL);
+		philo->info.total_time += philo->info.time_to_eat;
 		philo->info.total_time += ((1000000 * (time.tv_usec < last_time.tv_usec) + time.tv_usec - last_time.tv_usec));
 		if (ft_thinking(philo))
 			break ;
 		last_time = time;
-		
 		gettimeofday(&time, NULL);
 		philo->info.total_time += ((1000000 * (time.tv_usec < last_time.tv_usec) + time.tv_usec - last_time.tv_usec));
 		if (ft_sleeping(philo))
@@ -159,6 +154,33 @@ t_list	*init_fork_prot(int nbr, t_info info)
 	return (head);
 }
 
+void	get_order(t_list *philo)
+{
+	int	lcount;
+	int	flag;
+
+	flag =  philo->info.nbr_of_philosophers % 2 - 1;
+	while (1)
+	{
+		lcount = philo->info.nbr_of_philosophers / 2;
+		while (lcount-- > 0)
+		{
+			printf("%d\n", philo->p_nbr);
+			fflush(stdout);
+			philo = philo->right->right;
+		}
+		if (flag)
+		{
+			if (2 == philo->p_nbr)
+				philo = philo->left;
+			else if (1 == philo->p_nbr)
+				philo = philo->right;
+		}
+		printf("\n");
+		sleep(1);
+	}
+}
+
 int	init_infosophers(t_info info)
 {
 	int				ind;
@@ -171,15 +193,19 @@ int	init_infosophers(t_info info)
 	philo = init_fork_prot(info.nbr_of_philosophers, info);
 	if (philo == NULL)
 		return (free(nof), 1);
+	get_order(philo);
 	ind = -1;
 	while (++ind < info.nbr_of_philosophers)
 	{
 		if (pthread_create(nof + ind, NULL, run_code, philo))
 			return (1);
+		pthread_detach(nof[ind]);
 		philo = philo->right;
 	}
-	while(ind--)
-		pthread_join(nof[ind], NULL);
+	while(philo->info.all_alive)
+	{
+		
+	}
 	return (free(nof), ft_lstclear(&philo, info.nbr_of_philosophers), 0);
 }
 
@@ -187,7 +213,7 @@ int	main(int ac, char **av)
 {
 	t_info	info;
 
-	if (ac != 6)
+	if (ac < 5 || ac > 6)
 		return (write(2, "invalid number of arguments\n", 28));
 	if (int_info(ac, av, &info))
 		return (1);

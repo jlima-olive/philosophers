@@ -6,9 +6,13 @@
 #    By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/12 13:07:24 by jlima-so          #+#    #+#              #
-#    Updated: 2025/07/04 16:40:23 by jlima-so         ###   ########.fr        #
+#    Updated: 2025/09/05 22:10:47 by jlima-so         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
+# ifndef EXPOSE
+# MAKEFLAGS += --silent
+# endif
 
 PROJ=philo
 
@@ -24,9 +28,8 @@ BONUS_DIR=${PROJ}_bonus_dir/
 
 #OBJ_LIB=	${SRC_LIB:.c=.o}
 
-SRC_FILES=  $(wildcard ${SUBJ_DIR}*.c) \
-			$(wildcard listas/*.c) \
-
+SRC_FILES=  $(wildcard *.c) \
+			$(wildcard */*.c)
 
 OBJ_FILES=	${SRC_FILES:.c=.o}
 

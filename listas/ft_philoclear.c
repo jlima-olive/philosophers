@@ -1,31 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstnew.c                                        :+:      :+:    :+:   */
+/*   ft_philoclear.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/07/04 20:02:59 by jlima-so         ###   ########.fr       */
+/*   Created: 2025/03/25 17:21:27 by jlima-so          #+#    #+#             */
+/*   Updated: 2025/09/05 18:46:20 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-t_list	*ft_lstnew(t_list *left, t_list *right, int nbr, t_info info)
+void	ft_philoclear(t_philo **lst, int nbr)
 {
-	t_list			*new;
+	t_philo	*right_node;
 
-	new = malloc(sizeof(t_list));
-	if (new == NULL)
-		return (NULL);
-	if (pthread_mutex_init(&new->fork_prot, NULL))
-		return (free(new), NULL);
-	new->right = right;
-	new->left = left;
-	new->p_nbr = nbr;
-	new->info = info;
-	new->fork = 1;
-	new->ate = 0;
-	return (new);
+	if (lst == NULL || *lst == NULL)
+		return ;
+	while ((*lst)->right != NULL && --nbr > 0)
+	{
+		right_node = (*lst)->right;
+		free (*lst);
+		*lst = right_node;
+	}
+	free (*lst);
+	*lst = NULL;
 }

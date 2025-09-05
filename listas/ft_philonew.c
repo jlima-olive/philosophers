@@ -1,29 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstclear.c                                      :+:      :+:    :+:   */
+/*   ft_philonew.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/25 17:21:27 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/07/03 20:49:56 by jlima-so         ###   ########.fr       */
+/*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
+/*   Updated: 2025/09/05 18:51:12 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-void	ft_lstclear(t_list **lst, int nbr)
+t_philo	*ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 {
-	t_list	*right_node;
+	t_philo		*new;
 
-	if (lst == NULL || *lst == NULL)
-		return ;
-	while ((*lst)->right != NULL && --nbr > 0)
-	{
-		right_node = (*lst)->right;
-		free (*lst);
-		*lst = right_node;
-	}
-	free (*lst);
-	*lst = NULL;
+	new = malloc(sizeof(t_philo));
+	if (new == NULL)
+		return (NULL);
+	if (pthread_mutex_init(&new->eat_mutex, NULL))
+		return (free(new), NULL);
+	new->nbr = nbr;
+	new->right = right;
+	new->left = left;
+	new->info = info;
+	return (new);
 }

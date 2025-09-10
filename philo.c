@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/10 04:24:33 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/10 14:12:47 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,12 @@ long last_time_ate(t_philo *philo)
 void set_eating(t_philo *philo, int value)
 {
 	if (philo->nbr == 9)
-		printf("9 in\n");
+		printf("\t\t\t1 lock\n");
 	pthread_mutex_lock(&philo->eat_mutex);
 	philo->eating = value;
 	pthread_mutex_unlock(&philo->eat_mutex);
 	if (philo->nbr == 9)
-		printf("9 out\n");
+		printf("\t\t\t1 unlock\n");
 }
 
 void start_dying(t_philo *philo)
@@ -138,52 +138,108 @@ int all_alive(t_philo *philo)
 
 void allow_to_eat(t_philo *philo)
 {
+	if (philo->left->nbr == 9)
+		printf("\t\t\t21 lock\n");
 	pthread_mutex_lock(&philo->left->eat_mutex);
+	if (philo->right->nbr == 9)
+		printf("\t\t\t31 lock\n");
 	pthread_mutex_lock(&philo->right->eat_mutex);
 	while (philo->left->eating || philo->right->eating)
 	{
 		pthread_mutex_unlock(&philo->left->eat_mutex);
+		if (philo->left->nbr == 9)
+			printf("\t\t\t22 unlock\n");
 		pthread_mutex_unlock(&philo->right->eat_mutex);
-		usleep(10);
+		if (philo->right->nbr == 9)
+			printf("\t\t\t32 unlock\n");
+		usleep(20);
+		if (philo->left->nbr == 9)
+			printf("\t\t\t23 lock\n");
 		pthread_mutex_lock(&philo->left->eat_mutex);
+		if (philo->right->nbr == 9)
+			printf("\t\t\t33 lock\n");
 		pthread_mutex_lock(&philo->right->eat_mutex);
 	}
+	if (philo->right->nbr == 9)
+		printf("\t\t\t24 unlock\n");
 	pthread_mutex_unlock(&philo->left->eat_mutex);
+	if (philo->right->nbr == 9)
+		printf("\t\t\t34 unlock\n");
 	pthread_mutex_unlock(&philo->right->eat_mutex);
+	if (philo->nbr == 9)
+		printf("\t\t\t4 lock\n");
 	pthread_mutex_lock(&philo->eat_mutex);
 	philo->waiting_to_eat = 0;
 	// philo->eating = 1;
 	pthread_mutex_unlock(&philo->eat_mutex);
+	if (philo->nbr == 9)
+		printf("\t\t\t4 unlock\n");
 }
 
 void allow_one_to_eat(t_philo *philo, int flag, int group)
 {
 	if (flag)
+	{
+		if (philo->left->left->nbr == 9)
+			printf("\t\t\t51 lock\n");
 		pthread_mutex_lock(&philo->left->left->eat_mutex);
+	}
+	if (philo->left->nbr == 9)
+		printf("\t\t\t61 lock\n");
 	pthread_mutex_lock(&philo->left->eat_mutex);
+	if (philo->right->nbr == 9)
+		printf("\t\t\t71 lock\n");
 	pthread_mutex_lock(&philo->right->eat_mutex);
 	group = (philo->left->eating || (philo->left->left->eating && flag));
 	while (group || philo->right->eating)
 	{
 		if (flag)
+		{
 			pthread_mutex_unlock(&philo->left->left->eat_mutex);
+			if (philo->left->left->nbr == 9)
+				printf("\t\t\t52 unlock\n");
+		}
 		pthread_mutex_unlock(&philo->left->eat_mutex);
+		if (philo->left->nbr == 9)
+			printf("\t\t\t62 unlock\n");
 		pthread_mutex_unlock(&philo->right->eat_mutex);
-		usleep(10);
+		if (philo->right->nbr == 9)
+			printf("\t\t\t72 unlock\n");
+		usleep(20);
 		// printf("%d cant eat\n", philo->nbr);
-		pthread_mutex_lock(&philo->left->eat_mutex);
-		pthread_mutex_lock(&philo->right->eat_mutex);
 		if (flag)
+		{
+			if (philo->left->left->nbr == 9)
+				printf("\t\t\t53 lock\n");
 			pthread_mutex_lock(&philo->left->left->eat_mutex);
+		}
+		if (philo->left->nbr == 9)
+			printf("\t\t\t63 lock\n");
+		pthread_mutex_lock(&philo->left->eat_mutex);
+		if (philo->right->nbr == 9)
+			printf("\t\t\t73 lock\n");
+		pthread_mutex_lock(&philo->right->eat_mutex);
 		group = (philo->left->eating || (philo->left->left->eating && flag));
 	}
-	pthread_mutex_unlock(&philo->left->eat_mutex);
-	pthread_mutex_unlock(&philo->right->eat_mutex);
 	if (flag)
+	{
 		pthread_mutex_unlock(&philo->left->left->eat_mutex);
+		if (philo->left->left->nbr == 9)
+			printf("\t\t\t54 unlock\n");
+	}
+	pthread_mutex_unlock(&philo->left->eat_mutex);
+	if (philo->left->nbr == 9)
+		printf("\t\t\t64 unlock\n");
+	pthread_mutex_unlock(&philo->right->eat_mutex);
+	if (philo->right->nbr == 9)
+		printf("\t\t\t74 unlock\n");
+	if (philo->nbr == 9)
+		printf("\t\t\t81 lock\n");
 	pthread_mutex_lock(&philo->eat_mutex);
 	philo->waiting_to_eat = 0;
 	pthread_mutex_unlock(&philo->eat_mutex);
+	if (philo->nbr == 9)
+		printf("\t\t\t81 unlock\n");
 }
 
 void eat_perm(t_philo *philo, const t_info *info, int flag)
@@ -193,10 +249,13 @@ void eat_perm(t_philo *philo, const t_info *info, int flag)
 	if (philo->nbr == 1)
 	{
 		allow_one_to_eat(philo, flag, 0);
+			// printf("\t\tallowing %d to eat\n", philo->nbr);
+		// allow_to_eat(philo);
 		philo->eating = 1;
 		philo = philo->right->right;
 		while (philo->nbr < info->nbr_of_philo && philo->nbr != 1)
 		{
+			// printf("\t\tallowing %d to eat\n", philo->nbr);
 			allow_to_eat(philo);
 			philo = philo->right->right;
 		}
@@ -205,13 +264,15 @@ void eat_perm(t_philo *philo, const t_info *info, int flag)
 	{
 		while (philo->nbr <= info->nbr_of_philo - 1)
 		{
+			// printf("\t\t%d AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA lock\n", philo->nbr <= info->nbr_of_philo - 1);
+			// printf("\t\tallowing %d to eat\n", philo->nbr);
 			allow_to_eat(philo);
+			// printf("\t\t%d AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA unlock\n", philo->nbr <= info->nbr_of_philo - 1);
 			philo = philo->right->right;
-		printf("\t\tAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
 		}
 		if (last && flag)
 			philo = philo->left;
-		printf("\t\tAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+		printf("%d\n", philo->nbr);
 		allow_to_eat(philo);
 		last = !last;
 	}
@@ -240,11 +301,15 @@ void hypervise(t_philo *philo, const t_info *info, pthread_mutex_t *info_mutex)
 
 void wait_to_eat(t_philo *philo, long time_to_die)
 {
+	if (philo->nbr == 9)
+		printf("\t\t\t51 lock\n");
 	pthread_mutex_lock(&philo->eat_mutex);
 	while (philo->waiting_to_eat)
 	{
 		// printf("%d eat loop\n", philo->nbr);
 		pthread_mutex_unlock(&philo->eat_mutex);
+		if (philo->nbr == 9)
+			printf("\t\t\t51 unlock\n");
 		if (last_time_ate(philo) > time_to_die)
 		{
 			// printf("philo=%d\n", philo->nbr);
@@ -254,10 +319,14 @@ void wait_to_eat(t_philo *philo, long time_to_die)
 		}
 		if (all_alive(philo) == 0)
 			exit(0);
+		if (philo->nbr == 9)
+			printf("\t\t\t52 lock\n");
 		pthread_mutex_lock(&philo->eat_mutex);
 	}
 	philo->waiting_to_eat = 1;
 	pthread_mutex_unlock(&philo->eat_mutex);
+	if (philo->nbr == 9)
+		printf("\t\t\t52 unlock\n");
 }
 
 void wait_to_talk(t_philo *philo, long time_to_die)
@@ -332,25 +401,24 @@ void go_eat(t_philo *philo, int time_to_die)
 	printf("%ld %d is eating\n", total_time() / KILO, philo->nbr);
 	let_other_talk(philo);
 	better_usleep(philo, time, 1);
-	// if (philo->nbr == 9)
-		// printf("9 in\n");
 	set_eating(philo, 0);
-	// if (philo->nbr == 9)
-		// printf("9 out\n");
 	printf("%ld %d is done eating\n", total_time() / KILO, philo->nbr);
 	gettimeofday(&philo->lta, NULL);
 }
 
 int	check_times_ate(t_philo *philo, int value)
 {
+	int	ret;
+
 	while (philo->nbr != 1)
 		philo = philo->left;
 	philo = philo->left;
 	pthread_mutex_lock(&philo->left->eat_mutex);
 	pthread_mutex_lock(&philo->eat_mutex);
-	if (philo->times_ate >= value && philo->left->times_ate >= value)
-		return (1);
-	return (0);
+	ret = (philo->times_ate >= value) && (philo->left->times_ate >= value);
+	pthread_mutex_unlock(&philo->left->eat_mutex);
+	pthread_mutex_unlock(&philo->eat_mutex);
+	return (ret);
 }
 
 void	go_think(t_philo *philo, long time_to_die)

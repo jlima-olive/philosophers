@@ -6,7 +6,7 @@
 #    By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/12 13:07:24 by jlima-so          #+#    #+#              #
-#    Updated: 2025/09/09 22:13:24 by jlima-so         ###   ########.fr        #
+#    Updated: 2025/09/10 18:49:59 by jlima-so         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,9 +18,11 @@ PROJ=philo
 
 PROJ_BONUS=	${PROJ}_bonus
 
-SUBJ_DIR=${PROJ}_dir/
+DIR=${PROJ}_dir/
 
 BONUS_DIR=${PROJ}_bonus_dir/
+
+AUX_DIR=aux_dir/
 
 #SRC_LIB=	$(wildcard ${SRC_DIR1}*.c) \
 #			$(wildcard ${SRC_DIR2}*.c) \
@@ -39,6 +41,8 @@ OBJ_BONUS=	${SRC_BONUS:.c=.o}
 
 NAME=${PROJ}.a
 
+NAME_BONUS=${PROJ_BONUS}.a
+
 LIBFT=libft.a
 
 BONUS_ARQ=bonus.a
@@ -56,6 +60,9 @@ all: ${PROJ}
 ${NAME}: ${OBJ_FILES}
 	${AR} ${NAME} $?
 
+${NAME_BONUS}: ${OBJ_BONUS}
+	${AR} ${NAME_BONUS} $?
+
 #${LIBFT}: ${OBJ_LIB}
 #	cd my_libft && make
 
@@ -65,8 +72,8 @@ ${NAME}: ${OBJ_FILES}
 ${PROJ}: ${NAME} ${PROJ}.c
 	${CC} ${CFLAGS} ${PROJ}.c ${NAME} -o ${PROJ}
 
-${PROJ_BONUS}: ${NAME} ${PROJ_BONUS}.c
-	${CC} ${CFLAGS} ${PROJ_BONUS}.c ${NAME} -o ${PROJ_BONUS}
+${PROJ_BONUS}: ${NAME_BONUS} ${PROJ_BONUS}.c
+	${CC} ${CFLAGS} ${PROJ_BONUS}.c ${NAME_BONUS} -o ${PROJ_BONUS}
 
 %o: %c
 	${CC} ${CFLAGS} $@ $<

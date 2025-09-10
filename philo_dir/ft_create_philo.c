@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_philonew.c                                      :+:      :+:    :+:   */
+/*   ft_create_philo.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/10 18:20:01 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/10 19:12:08 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,4 +30,42 @@ t_philo	*ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 	new->times_ate = 0;
 	new->waiting_to_eat = 1;
 	return (new);
+}
+
+void	ft_philoclear(t_philo *philo)
+{
+	if (philo == NULL)
+		return ;
+	if (philo->nbr != philo->info->nbr_of_philo)
+		ft_philoclear(philo->right);
+	pthread_mutex_destroy(&philo->eat_mutex);
+	free (philo);
+}
+
+t_philo	*init_philo_and_mutex(int nbr, t_info *info, pthread_mutex_t *mutex)
+{
+	t_philo	*philo;
+	t_philo	*head;
+	int		ind;
+
+	philo = ft_philonew(NULL, NULL, 1, info);
+	philo->info_mutex = mutex;
+	if (philo == NULL)
+		return (NULL);
+	head = philo;
+	ind = 1;
+	while (++ind < nbr)
+	{
+		philo->right = ft_philonew(philo, NULL, ind, info);
+		if (philo->right == NULL)
+			return (ft_philoclear(head), NULL);
+		philo->right->info_mutex = mutex;
+		philo = philo->right;
+	}
+	philo->right = ft_philonew(philo, head, nbr, info);
+	if (philo->right == NULL)
+		return (ft_philoclear(head), NULL);
+	philo->right->info_mutex = mutex;
+	head->left = philo->right;
+	return (head);
 }

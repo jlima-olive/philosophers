@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/05 18:51:12 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/09 17:25:57 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,5 +25,8 @@ t_philo	*ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 	new->right = right;
 	new->left = left;
 	new->info = info;
+	new->alive = 1;
+	new->eating = 0;
+	new->waiting_to_eat = 1;
 	return (new);
 }

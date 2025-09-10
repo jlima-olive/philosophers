@@ -6,116 +6,103 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/05 22:37:19 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/10 04:24:33 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-
-/*
-void	*run_code(void *arg)
+long total_time(void)
 {
-	int				ind;
-	t_philo			*philo;
-	struct timeval	time;
-	struct timeval	last_time;
-	long int		total_time;
-
-	philo = (t_philo *)arg;
-	// if (philo->p_nbr != philo->info->nbr_of_philo)
-	// 	usleep(200);
-	// else
-	// {
-	// 	pthread_mutex_lock(&philo->info->start_banquet);
-	// 	usleep(200);
-	// }
-	// pthread_mutex_unlock(&philo->info->start_banquet);
-	gettimeofday(&last_time, NULL);
-	total_time = 0;
-	ind = 0;
-	while (1 && ++ind)
-	{
-		gettimeofday(&time, NULL);
-		total_time += (philo->info->time_to_eat) * (philo->p_nbr % 2 - 1 != 0);
-		if (ft_eating(philo, total_time , time ))
-			break ;
-		total_time += (philo->info->time_to_eat);
-		last_time = time;
-		gettimeofday(&time, NULL);
-		// total_time += philo->info->time_to_eat;
-		// total_time += ((1000000 * (time.tv_usec < last_time.tv_usec) + time.tv_usec - last_time.tv_usec));
-		if (ft_thinking(philo))
-			break ;
-		last_time = time;
-		gettimeofday(&time, NULL);
-		// total_time += ((1000000 * (time.tv_usec < last_time.tv_usec) + time.tv_usec - last_time.tv_usec));
-		if (ft_sleeping(philo))
-			break ;
-		last_time = time;
-	}
-	return (NULL);
-}
-*/
-
-long	total_time(void)
-{
-	static int		 		flag;
-	static struct timeval	start;
-	struct timeval			curr;
-	long					ret;
+	static int		flag;
+	static struct	timeval start;
+	struct			timeval curr;
+	long ret;
 
 	if (flag == 0)
+	{
 		gettimeofday(&start, NULL);
-	flag++;
+		flag++;
+	}
 	gettimeofday(&curr, NULL);
 	ret = MEGA * (curr.tv_sec - start.tv_sec) + curr.tv_usec - start.tv_usec;
 	return (ret);
 }
 
-long	last_time_ate(t_philo *philo)
+long last_time_ate(t_philo *philo)
 {
-	struct timeval	curr;
-	long			ret;	
+	struct	timeval curr;
+	long	ret;
 
 	gettimeofday(&curr, NULL);
 	ret = MEGA * curr.tv_sec + curr.tv_usec;
-	ret = ret - (MEGA * philo->lta.tv_sec  + philo->lta.tv_usec);
-	return (ret / KILO);
+	ret = ret - (MEGA * philo->lta.tv_sec + philo->lta.tv_usec);
+	return (ret);
 }
 
-int	int_info(int ac, char **av, t_info *info)
+void set_eating(t_philo *philo, int value)
+{
+	if (philo->nbr == 9)
+		printf("9 in\n");
+	pthread_mutex_lock(&philo->eat_mutex);
+	philo->eating = value;
+	pthread_mutex_unlock(&philo->eat_mutex);
+	if (philo->nbr == 9)
+		printf("9 out\n");
+}
+
+void start_dying(t_philo *philo)
+{
+	set_eating(philo, 0);
+	pthread_mutex_lock(philo->info_mutex);
+	if (philo->info->all_alive == 0)
+	{
+		pthread_mutex_unlock(philo->info_mutex);
+		exit(0);
+	}
+	philo->info->all_alive = 0;
+	while (philo->info->talk_perms == 0)
+	{
+		pthread_mutex_unlock(philo->info_mutex);
+		pthread_mutex_lock(philo->info_mutex);
+	}
+	pthread_mutex_unlock(philo->info_mutex);
+	printf("%ld %d died", total_time() / KILO, philo->nbr);
+	exit(0);
+}
+
+int int_info(int ac, char **av, t_info *info)
 {
 	info->nbr_of_philo = ft_atoi(av[1]);
-	info->time_to_die = ft_atoi(av[2]);
-	info->time_to_eat = ft_atoi(av[3]);
-	info->time_to_sleep = ft_atoi(av[4]);
+	info->time_to_die = ft_atoi(av[2]) * KILO;
+	info->time_to_eat = ft_atoi(av[3]) * KILO;
+	info->time_to_sleep = ft_atoi(av[4]) * KILO;
 	info->notepme = -1;
 	if (ac > 5)
 		info->notepme = ft_atoi(av[5]);
-	info->continue_sim = 1;
+	info->all_alive = 1;
 	return (0);
 }
 
-int	exit_message(t_info *info)
+int exit_message(t_info *info)
 {
-	write(2, "invalid number of philosophers\n", \
-		(info->nbr_of_philo <= 0) * 32);
+	write(2, "invalid number of philosophers\n",
+		  (info->nbr_of_philo <= 0) * 32);
 	write(2, "invalid time to die\n", (info->time_to_die <= 0) * 21);
 	write(2, "invalid time to eat\n", (info->time_to_eat <= 0) * 21);
 	write(2, "invalid time to sleep\n", (info->time_to_sleep <= 0) * 23);
-	write(2, "invalid number of times each philosopher must eat \n", \
-		(info->notepme <= 0) * 52);
-	return ((info->nbr_of_philo <= 0) + (info->time_to_die <= 0) + \
-		(info->time_to_eat <= 0) + (info->time_to_sleep <= 0) + \
-		(info->notepme <= 0));
+	write(2, "invalid number of times each philosopher must eat \n",
+		  (info->notepme <= 0) * 52);
+	return ((info->nbr_of_philo <= 0) + (info->time_to_die <= 0) +
+			(info->time_to_eat <= 0) + (info->time_to_sleep <= 0) +
+			(info->notepme <= 0));
 }
 
-t_philo	*init_philo_and_mutex(int nbr, t_info *info, pthread_mutex_t *info_mutex)
+t_philo *init_philo_and_mutex(int nbr, t_info *info, pthread_mutex_t *info_mutex)
 {
-	t_philo			*philo;
-	t_philo			*head;
-	int				ind;
+	t_philo *philo;
+	t_philo *head;
+	int ind;
 
 	philo = ft_philonew(NULL, NULL, 1, info);
 	philo->info_mutex = info_mutex;
@@ -127,23 +114,304 @@ t_philo	*init_philo_and_mutex(int nbr, t_info *info, pthread_mutex_t *info_mutex
 	{
 		philo->right = ft_philonew(philo, NULL, ind, info);
 		if (philo->right == NULL)
-			return (ft_philoclear(&head, ind - 1), NULL);
+			return (ft_philoclear(head), NULL);
 		philo->right->info_mutex = info_mutex;
 		philo = philo->right;
 	}
 	philo->right = ft_philonew(philo, head, nbr, info);
 	if (philo->right == NULL)
-		return (ft_philoclear(&head, ind - 1), NULL);
+		return (ft_philoclear(head), NULL);
 	philo->right->info_mutex = info_mutex;
 	head->left = philo->right;
 	return (head);
 }
 
-int	init_infosophers(t_info *info, pthread_mutex_t	*info_mutex)
+int all_alive(t_philo *philo)
 {
-	int				ind;
-	t_philo			*philo;
-	pthread_t		*nof;
+	int ret;
+
+	pthread_mutex_lock(philo->info_mutex);
+	ret = philo->info->all_alive;
+	pthread_mutex_unlock(philo->info_mutex);
+	return (ret);
+}
+
+void allow_to_eat(t_philo *philo)
+{
+	pthread_mutex_lock(&philo->left->eat_mutex);
+	pthread_mutex_lock(&philo->right->eat_mutex);
+	while (philo->left->eating || philo->right->eating)
+	{
+		pthread_mutex_unlock(&philo->left->eat_mutex);
+		pthread_mutex_unlock(&philo->right->eat_mutex);
+		usleep(10);
+		pthread_mutex_lock(&philo->left->eat_mutex);
+		pthread_mutex_lock(&philo->right->eat_mutex);
+	}
+	pthread_mutex_unlock(&philo->left->eat_mutex);
+	pthread_mutex_unlock(&philo->right->eat_mutex);
+	pthread_mutex_lock(&philo->eat_mutex);
+	philo->waiting_to_eat = 0;
+	// philo->eating = 1;
+	pthread_mutex_unlock(&philo->eat_mutex);
+}
+
+void allow_one_to_eat(t_philo *philo, int flag, int group)
+{
+	if (flag)
+		pthread_mutex_lock(&philo->left->left->eat_mutex);
+	pthread_mutex_lock(&philo->left->eat_mutex);
+	pthread_mutex_lock(&philo->right->eat_mutex);
+	group = (philo->left->eating || (philo->left->left->eating && flag));
+	while (group || philo->right->eating)
+	{
+		if (flag)
+			pthread_mutex_unlock(&philo->left->left->eat_mutex);
+		pthread_mutex_unlock(&philo->left->eat_mutex);
+		pthread_mutex_unlock(&philo->right->eat_mutex);
+		usleep(10);
+		// printf("%d cant eat\n", philo->nbr);
+		pthread_mutex_lock(&philo->left->eat_mutex);
+		pthread_mutex_lock(&philo->right->eat_mutex);
+		if (flag)
+			pthread_mutex_lock(&philo->left->left->eat_mutex);
+		group = (philo->left->eating || (philo->left->left->eating && flag));
+	}
+	pthread_mutex_unlock(&philo->left->eat_mutex);
+	pthread_mutex_unlock(&philo->right->eat_mutex);
+	if (flag)
+		pthread_mutex_unlock(&philo->left->left->eat_mutex);
+	pthread_mutex_lock(&philo->eat_mutex);
+	philo->waiting_to_eat = 0;
+	pthread_mutex_unlock(&philo->eat_mutex);
+}
+
+void eat_perm(t_philo *philo, const t_info *info, int flag)
+{
+	static int last;
+
+	if (philo->nbr == 1)
+	{
+		allow_one_to_eat(philo, flag, 0);
+		philo->eating = 1;
+		philo = philo->right->right;
+		while (philo->nbr < info->nbr_of_philo && philo->nbr != 1)
+		{
+			allow_to_eat(philo);
+			philo = philo->right->right;
+		}
+	}
+	else
+	{
+		while (philo->nbr <= info->nbr_of_philo - 1)
+		{
+			allow_to_eat(philo);
+			philo = philo->right->right;
+		printf("\t\tAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+		}
+		if (last && flag)
+			philo = philo->left;
+		printf("\t\tAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+		allow_to_eat(philo);
+		last = !last;
+	}
+}
+
+void hypervise(t_philo *philo, const t_info *info, pthread_mutex_t *info_mutex)
+{
+	int flag;
+
+	flag = philo->left->nbr;
+	if (flag == 1)
+		return ;
+	flag = flag % 2;
+	pthread_mutex_lock(info_mutex);
+	while (info->all_alive)
+	{
+		pthread_mutex_unlock(info_mutex);
+		eat_perm(philo, info, flag);
+		usleep(1000);
+		eat_perm(philo->right, info, flag);
+		usleep(1000);
+		pthread_mutex_lock(info_mutex);
+	}
+	pthread_mutex_unlock(info_mutex);
+}
+
+void wait_to_eat(t_philo *philo, long time_to_die)
+{
+	pthread_mutex_lock(&philo->eat_mutex);
+	while (philo->waiting_to_eat)
+	{
+		// printf("%d eat loop\n", philo->nbr);
+		pthread_mutex_unlock(&philo->eat_mutex);
+		if (last_time_ate(philo) > time_to_die)
+		{
+			// printf("philo=%d\n", philo->nbr);
+			printf("%d->eating=%d\n", philo->right->nbr, philo->right->eating);
+			printf("%d->eating=%d\n", philo->left->nbr, philo->left->eating);
+			start_dying(philo);
+		}
+		if (all_alive(philo) == 0)
+			exit(0);
+		pthread_mutex_lock(&philo->eat_mutex);
+	}
+	philo->waiting_to_eat = 1;
+	pthread_mutex_unlock(&philo->eat_mutex);
+}
+
+void wait_to_talk(t_philo *philo, long time_to_die)
+{
+	pthread_mutex_lock(philo->info_mutex);
+	while (philo->info->talk_perms == 0)
+	{
+		printf("talk loop\n");
+		pthread_mutex_unlock(philo->info_mutex);
+		usleep(25);
+		if (last_time_ate(philo) > time_to_die)
+			start_dying(philo);
+		if (all_alive(philo) == 0)
+			exit(0);
+		pthread_mutex_lock(philo->info_mutex);
+	}
+	philo->info->talk_perms = 0;
+	pthread_mutex_unlock(philo->info_mutex);
+}
+
+void let_other_talk(t_philo *philo)
+{
+	pthread_mutex_lock(philo->info_mutex);
+	philo->info->talk_perms = 1;
+	pthread_mutex_unlock(philo->info_mutex);
+}
+
+void better_usleep(t_philo *philo, long time_to_sleep, int flag)
+{
+	long time;
+
+	time = total_time();
+	while (total_time() - time < time_to_sleep - 100)
+	{
+		// printf("%d %ld - %ld < %ld\n", philo->nbr, total_time(), time, time_to_sleep - 100);
+		usleep(100);
+		if (all_alive(philo) == 0)
+		{
+			set_eating(philo, 0);
+			exit(0);
+		}
+		if (flag == 0 && last_time_ate(philo) > philo->info->time_to_die)
+			start_dying(philo);
+	}
+	time_to_sleep = time_to_sleep - (total_time() - time);
+	if (time_to_sleep > 0)
+		usleep(time_to_sleep);
+}
+
+void go_eat(t_philo *philo, int time_to_die)
+{
+	long	time;
+
+	pthread_mutex_lock(philo->info_mutex);
+	time = philo->info->time_to_eat - last_time_ate(philo);
+	pthread_mutex_unlock(philo->info_mutex);
+	wait_to_eat(philo, time_to_die);
+	if (last_time_ate(philo) > time_to_die)
+	{
+		set_eating(philo, 0);
+		start_dying(philo);
+	}
+	if (all_alive(philo) == 0)
+	{
+		set_eating(philo, 0);
+		exit(0);
+	}
+	wait_to_talk(philo, time_to_die);
+	set_eating(philo, 1);
+	printf("%ld %d has taken a fork\n", total_time() / KILO, philo->nbr);
+	printf("%ld %d has taken a fork\n", total_time() / KILO, philo->nbr);
+	printf("%ld %d is eating\n", total_time() / KILO, philo->nbr);
+	let_other_talk(philo);
+	better_usleep(philo, time, 1);
+	// if (philo->nbr == 9)
+		// printf("9 in\n");
+	set_eating(philo, 0);
+	// if (philo->nbr == 9)
+		// printf("9 out\n");
+	printf("%ld %d is done eating\n", total_time() / KILO, philo->nbr);
+	gettimeofday(&philo->lta, NULL);
+}
+
+int	check_times_ate(t_philo *philo, int value)
+{
+	while (philo->nbr != 1)
+		philo = philo->left;
+	philo = philo->left;
+	pthread_mutex_lock(&philo->left->eat_mutex);
+	pthread_mutex_lock(&philo->eat_mutex);
+	if (philo->times_ate >= value && philo->left->times_ate >= value)
+		return (1);
+	return (0);
+}
+
+void	go_think(t_philo *philo, long time_to_die)
+{
+	long	time;
+
+	pthread_mutex_lock(philo->info_mutex);
+	time = philo->info->time_to_eat - last_time_ate(philo);
+	pthread_mutex_unlock(philo->info_mutex);
+	wait_to_talk(philo, time_to_die);
+	printf("%ld %d is thinking\n", total_time() / KILO, philo->nbr);
+	let_other_talk(philo);
+	better_usleep(philo, time, 0);
+}
+
+void	go_sleep(t_philo *philo, long time_to_die)
+{
+	long	time;
+
+	pthread_mutex_lock(philo->info_mutex);
+	time = philo->info->time_to_sleep;
+	pthread_mutex_unlock(philo->info_mutex);
+	wait_to_talk(philo, time_to_die);
+	printf("%ld %d is sleeping\n", total_time() / KILO, philo->nbr);
+	let_other_talk(philo);
+	better_usleep(philo, time, 0);
+}
+
+void	*run_code(void *var)
+{
+	t_philo	*philo;
+	int		time_to_die;
+	int		notepme;
+
+	philo = (t_philo *)var;
+	if (philo->info->nbr_of_philo == 1)
+	{
+		usleep(philo->info->time_to_die);
+		return (printf("%ld 1 died\n", total_time() / KILO), NULL);
+	}
+	pthread_mutex_lock(philo->info_mutex);
+	notepme = philo->info->notepme;
+	time_to_die = philo->info->time_to_die;
+	pthread_mutex_unlock(philo->info_mutex);
+	gettimeofday(&philo->lta, NULL);
+	while (all_alive(philo))
+	{
+		go_eat(philo, time_to_die);
+		if (notepme != -1 && check_times_ate(philo, notepme))
+			exit(0);
+		go_sleep(philo, time_to_die);
+		go_think(philo, time_to_die);
+	}
+	return (NULL);
+}
+
+int init_infosophers(t_info *info, pthread_mutex_t *info_mutex)
+{
+	int			ind;
+	t_philo		*philo;
+	pthread_t	*nof;
 
 	nof = malloc(info->nbr_of_philo * sizeof(pthread_t));
 	if (nof == NULL)
@@ -151,39 +419,38 @@ int	init_infosophers(t_info *info, pthread_mutex_t	*info_mutex)
 	philo = init_philo_and_mutex(info->nbr_of_philo, info, info_mutex);
 	if (philo == NULL)
 		return (free(nof), 1);
-	/* while (philo->nbr != philo->info->nbr_of_philo)
-	{
-		printf("philo->nbr=%d\n", philo->nbr);
-		philo = philo->right;
-	}
-	printf("%ld %ld\n", philo->lta.tv_sec, philo->lta.tv_usec);
-	return (0); */
+	// while (philo->nbr != philo->info->nbr_of_philo)
+	// {
+	// 	printf("philo->nbr=%d\n", philo->nbr);
+	// 	philo = philo->right;
+	// }
+	// printf("philo->nbr=%d\n", philo->nbr);
+	// return (0);
 	ind = -1;
+	total_time();
 	while (++ind < info->nbr_of_philo)
 	{
 		if (pthread_create(nof + ind, NULL, run_code, philo))
-			return (ft_philoclear(philo, info->nbr_of_philo), free(nof), 1);
-		pthread_detach(nof[ind]);
+		{
+			return (ft_philoclear(philo), free(nof), 1);
+		}
+		// pthread_detach(nof[ind]);
 		philo = philo->right;
 	}
-	if (pthread_create(nof + ind, NULL, hypervise, philo))
-		return (work(), ft_philoclear(philo, info->nbr_of_philo), free(nof));
-	pthread_mutex_lock(info_mutex);
-	while(info->continue_sim)
+	// sleep(1);
+	hypervise(philo, info, info_mutex);
+	while (ind-- > 0)
 	{
-		pthread_mutex_unlock(info_mutex);
-		usleep(100);
-		pthread_mutex_lock(info_mutex);
+		pthread_join(nof[ind], NULL);
+		printf("closing %d\n", ind);	
 	}
-	pthread_mutex_unlock(info_mutex);
-
-	return (free(nof), ft_lstclear(&philo, info->nbr_of_philo), 0);
+	return (free(nof), ft_philoclear(philo), 0);
 }
 
-int	main(int ac, char **av)
+int main(int ac, char **av)
 {
- 	pthread_mutex_t	info_mutex;
-	t_info			info;
+	pthread_mutex_t info_mutex;
+	t_info info;
 
 	if (ac != 5 && ac != 6)
 		return (write(2, "invalid number of arguments\n", 28));
@@ -194,12 +461,13 @@ int	main(int ac, char **av)
 	if (pthread_mutex_init(&info_mutex, NULL))
 		return (1);
 	printf("nbr_of_philo:%d\n", info.nbr_of_philo);
-	printf("time_to_die:%d\n", info.time_to_die);
-	printf("time_to_eat:%d\n", info.time_to_eat);
-	printf("time_to_sleep:%d\n", info.time_to_sleep);
+	printf("time_to_die:%d\n", info.time_to_die / KILO);
+	printf("time_to_eat:%d\n", info.time_to_eat / KILO);
+	printf("time_to_sleep:%d\n", info.time_to_sleep / KILO);
 	printf("notepme:%d\n", info.notepme);
 	printf("\nstarting now\n");
 	init_infosophers(&info, &info_mutex);
 	pthread_mutex_destroy(&info_mutex);
+	printf("ending now\n");
 	return (0);
 }

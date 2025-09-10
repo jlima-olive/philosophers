@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/05 22:35:40 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/09 21:29:45 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@
 #  define KILO 1000
 # endif
 
-
 typedef struct s_info
 {
 	int				nbr_of_philo;
@@ -40,18 +39,19 @@ typedef struct s_info
 	int				time_to_sleep;
 	int				talk_perms;
 	int				all_alive;
-	int				continue_sim;
-	long			totaltime;
 }	t_info;
 
 typedef struct s_philo
 {
 	int				nbr;
-	struct timeval	lta;
 	struct s_philo	*left;
 	struct s_philo	*right;
+	int				alive;
+	struct timeval	lta;
 	pthread_mutex_t	eat_mutex;
 	int				eating;
+	int				times_ate;
+	int				waiting_to_eat;
 	pthread_mutex_t	*info_mutex;
 	t_info			*info;
 }	t_philo;
@@ -65,7 +65,7 @@ int		ft_atoi(const char *str);
 left and right nodes to connect to if htere is no node to conect to use NULL */
 t_philo	*ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info);
 // philo is the address of the head of the list to delete, limit is how many nodes to delete
-void	ft_philoclear(t_philo **lst, int nbr);
+void	ft_philoclear(t_philo *philo);
 
 // writes number nbr into file descriptor fd 
 void	ft_putnbr_fd(int nbr, int fd);

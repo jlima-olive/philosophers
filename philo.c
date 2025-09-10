@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/10 15:28:18 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/10 15:32:01 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -398,7 +398,7 @@ void go_eat(t_philo *philo, int time_to_die)
 	set_eating(philo, 1);
 	printf("%ld %d has taken a fork\n", total_time() / KILO, philo->nbr);
 	printf("%ld %d has taken a fork\n", total_time() / KILO, philo->nbr);
-	printf("%ld %d is eating for %ldml\n", total_time() / KILO, philo->nbr, time / KILO);
+	printf("%ld %d is eating\n", total_time() / KILO, philo->nbr);
 	let_other_talk(philo);
 	better_usleep(philo, time, 1);
 	set_eating(philo, 0);
@@ -428,7 +428,7 @@ void	go_think(t_philo *philo, long time_to_die)
 	time = philo->info->time_to_eat - last_time_ate(philo);
 	pthread_mutex_unlock(philo->info_mutex);
 	wait_to_talk(philo, time_to_die);
-	printf("%ld %d is thinking for %ldml\n", total_time() / KILO, philo->nbr, time / KILO);
+	printf("%ld %d is thinking\n", total_time() / KILO, philo->nbr);
 	let_other_talk(philo);
 	better_usleep(philo, time, 0);
 }
@@ -441,7 +441,7 @@ void	go_sleep(t_philo *philo, long time_to_die)
 	time = philo->info->time_to_sleep;
 	pthread_mutex_unlock(philo->info_mutex);
 	wait_to_talk(philo, time_to_die);
-	printf("%ld %d is sleeping for %ldml\n", total_time() / KILO, philo->nbr, time / KILO);
+	printf("%ld %d is sleeping\n", total_time() / KILO, philo->nbr);
 	let_other_talk(philo);
 	better_usleep(philo, time, 0);
 }

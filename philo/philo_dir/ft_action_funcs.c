@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:24:53 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/11 23:28:00 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,13 +77,19 @@ int go_sleep(t_philo *philo, long time_to_die)
 void grab_spoon(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->eat_mutex);
+	pthread_mutex_lock(&philo->left_eat_mutex);
 	philo->spoon = 1;
+	*philo->left_spoon = 1;
+	pthread_mutex_unlock(&philo->left_eat_mutex);
 	pthread_mutex_unlock(&philo->eat_mutex);
 }
 
 void drop_spoon(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->eat_mutex);
+	pthread_mutex_lock(&philo->left_eat_mutex);
 	philo->spoon = 0;
+	*philo->left_spoon = 0;
 	pthread_mutex_unlock(&philo->eat_mutex);
+	pthread_mutex_unlock(&philo->left_eat_mutex);
 }

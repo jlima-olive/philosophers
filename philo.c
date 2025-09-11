@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/10 19:05:35 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/11 18:09:22 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,11 @@ int	exit_message(t_info *info, int ac)
 				(info->notepme <= 0) && ac > 5);
 }
 
-void	*run_code(void *var)
+void *run_code(void *var)
 {
-	t_philo	*philo;
-	int		time_to_die;
-	int		notepme;
+	t_philo *philo;
+	int time_to_die;
+	int notepme;
 
 	philo = (t_philo *)var;
 	if (philo->info->nbr_of_philo == 1)
@@ -63,18 +63,18 @@ void	*run_code(void *var)
 		if (go_eat(philo, time_to_die))
 			return (NULL);
 		if (notepme != -1 && check_times_ate(philo, notepme))
-			exit(0);
+			return (NULL);
 		if (go_sleep(philo, time_to_die) || go_think(philo, time_to_die))
 			return (NULL);
 	}
 	return (NULL);
 }
 
-int	init_infosophers(t_info *info, pthread_mutex_t *info_mutex)
+int init_infosophers(t_info *info, pthread_mutex_t *info_mutex)
 {
-	int			ind;
-	t_philo		*philo;
-	pthread_t	*nof;
+	int ind;
+	t_philo *philo;
+	pthread_t *nof;
 
 	nof = malloc((info->nbr_of_philo + 1) * sizeof(pthread_t));
 	if (nof == NULL)
@@ -96,10 +96,10 @@ int	init_infosophers(t_info *info, pthread_mutex_t *info_mutex)
 	return (free(nof), ft_philoclear(philo), 0);
 }
 
-int	main(int ac, char **av)
+int main(int ac, char **av)
 {
-	pthread_mutex_t	info_mutex;
-	t_info			info;
+	pthread_mutex_t info_mutex;
+	t_info info;
 
 	if (ac != 5 && ac != 6)
 		return (write(2, "invalid number of arguments\n", 28));
@@ -109,13 +109,14 @@ int	main(int ac, char **av)
 		return (1);
 	if (pthread_mutex_init(&info_mutex, NULL))
 		return (1);
-	printf("nbr_of_philo:%d\n", info.nbr_of_philo);
-	printf("time_to_die:%d\n", info.time_to_die / KILO);
-	printf("time_to_eat:%d\n", info.time_to_eat / KILO);
-	printf("time_to_sleep:%d\n", info.time_to_sleep / KILO);
-	printf("notepme:%d\n", info.notepme);
-	printf("\nstarting now\n");
 	init_infosophers(&info, &info_mutex);
 	pthread_mutex_destroy(&info_mutex);
 	return (0);
 }
+
+/* 	printf("nbr_of_philo:%d\n", info.nbr_of_philo);
+	printf("time_to_die:%d\n", info.time_to_die / KILO);
+	printf("time_to_eat:%d\n", info.time_to_eat / KILO);
+	printf("time_to_sleep:%d\n", info.time_to_sleep / KILO);
+	printf("notepme:%d\n", info.notepme);
+	printf("\nstarting now\n"); */

@@ -6,70 +6,68 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/10 18:57:08 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/11 18:01:31 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-static void	allow_to_eat(t_philo *philo)
+static void allow_to_eat(t_philo *philo)
 {
-	pthread_mutex_lock(&philo->left->eat_mutex);
-	pthread_mutex_lock(&philo->right->eat_mutex);
-	while (philo->left->eating || philo->right->eating)
+	pthread_mutex_lock(&philo->left_eat_mutex);
+	pthread_mutex_lock(&philo->eat_mutex);
+	while (all_alive(philo) && (*philo->left_spoon || philo->spoon))
 	{
-		pthread_mutex_unlock(&philo->left->eat_mutex);
-		pthread_mutex_unlock(&philo->right->eat_mutex);
-		usleep(20);
-		pthread_mutex_lock(&philo->left->eat_mutex);
-		pthread_mutex_lock(&philo->right->eat_mutex);
+		pthread_mutex_unlock(&philo->left_eat_mutex);
+		pthread_mutex_unlock(&philo->eat_mutex);
+		usleep(1);
+		pthread_mutex_lock(&philo->left_eat_mutex);
+		pthread_mutex_lock(&philo->eat_mutex);
 	}
-	pthread_mutex_unlock(&philo->left->eat_mutex);
-	pthread_mutex_unlock(&philo->right->eat_mutex);
+	pthread_mutex_unlock(&philo->left_eat_mutex);
+	pthread_mutex_unlock(&philo->eat_mutex);
 	pthread_mutex_lock(&philo->eat_mutex);
 	philo->waiting_to_eat = 0;
 	pthread_mutex_unlock(&philo->eat_mutex);
 }
 
-static void	allow_one_to_eat(t_philo *philo, int flag, int group)
+static void allow_one_to_eat(t_philo *philo, int flag, int group)
 {
 	if (flag)
-		pthread_mutex_lock(&philo->left->left->eat_mutex);
-	pthread_mutex_lock(&philo->left->eat_mutex);
-	pthread_mutex_lock(&philo->right->eat_mutex);
-	group = (philo->left->eating || (philo->left->left->eating && flag));
-	while (group || philo->right->eating)
+		pthread_mutex_lock(&philo->left->left_eat_mutex);
+	pthread_mutex_lock(&philo->left_eat_mutex);
+	pthread_mutex_lock(&philo->eat_mutex);
+	group = (*philo->left_spoon || (*philo->left->left_spoon && flag));
+	while (all_alive(philo) == 1 && (group || philo->spoon))
 	{
 		if (flag)
-			pthread_mutex_unlock(&philo->left->left->eat_mutex);
-		pthread_mutex_unlock(&philo->left->eat_mutex);
-		pthread_mutex_unlock(&philo->right->eat_mutex);
-		usleep(20);
+			pthread_mutex_unlock(&philo->left->left_eat_mutex);
+		pthread_mutex_unlock(&philo->left_eat_mutex);
+		pthread_mutex_unlock(&philo->eat_mutex);
+		usleep(1);
 		if (flag)
-			pthread_mutex_lock(&philo->left->left->eat_mutex);
-		pthread_mutex_lock(&philo->left->eat_mutex);
-		pthread_mutex_lock(&philo->right->eat_mutex);
-		group = (philo->left->eating || (philo->left->left->eating && flag));
+			pthread_mutex_lock(&philo->left->left_eat_mutex);
+		pthread_mutex_lock(&philo->left_eat_mutex);
+		pthread_mutex_lock(&philo->eat_mutex);
+		group = (*philo->left_spoon || (*philo->left->left_spoon && flag));
 	}
 	if (flag)
-		pthread_mutex_unlock(&philo->left->left->eat_mutex);
-	pthread_mutex_unlock(&philo->left->eat_mutex);
-	pthread_mutex_unlock(&philo->right->eat_mutex);
-	pthread_mutex_lock(&philo->eat_mutex);
+		pthread_mutex_unlock(&philo->left->left_eat_mutex);
+	pthread_mutex_unlock(&philo->left_eat_mutex);
 	philo->waiting_to_eat = 0;
 	pthread_mutex_unlock(&philo->eat_mutex);
 }
 
-static void	eat_perm(t_philo *philo, const t_info *info, int flag)
+static void eat_perm(t_philo *philo, const t_info *info, int flag)
 {
-	static int	last;
+	static int last;
 
 	if (philo->nbr == 1)
 	{
 		allow_one_to_eat(philo, flag, 0);
-		philo->eating = 1;
+		philo->spoon = 1;
 		philo = philo->right->right;
-		while (philo->nbr < info->nbr_of_philo && philo->nbr != 1)
+		while (all_alive(philo) == 1 && philo->nbr < info->nbr_of_philo && philo->nbr != 1)
 		{
 			allow_to_eat(philo);
 			philo = philo->right->right;
@@ -77,7 +75,7 @@ static void	eat_perm(t_philo *philo, const t_info *info, int flag)
 	}
 	else
 	{
-		while (philo->nbr <= info->nbr_of_philo - 1 - flag)
+		while (all_alive(philo) == 1 && philo->nbr <= info->nbr_of_philo - 1 - flag)
 		{
 			allow_to_eat(philo);
 			philo = philo->right->right;
@@ -89,9 +87,9 @@ static void	eat_perm(t_philo *philo, const t_info *info, int flag)
 	}
 }
 
-void	*hypervise(t_philo *philo, t_info *info, pthread_mutex_t *info_mutex)
+void *hypervise(t_philo *philo, t_info *info, pthread_mutex_t *info_mutex)
 {
-	int	flag;
+	int flag;
 
 	flag = philo->left->nbr;
 	if (flag == 1)
@@ -102,9 +100,9 @@ void	*hypervise(t_philo *philo, t_info *info, pthread_mutex_t *info_mutex)
 	{
 		pthread_mutex_unlock(info_mutex);
 		eat_perm(philo, info, flag);
-		usleep(20);
+		usleep(1);
 		eat_perm(philo->right, info, flag);
-		usleep(20);
+		usleep(1);
 		pthread_mutex_lock(info_mutex);
 	}
 	pthread_mutex_unlock(info_mutex);

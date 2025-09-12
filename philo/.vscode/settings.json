@@ -55,17 +55,5 @@
   "C_Cpp_Runner.useLeakSanitizer": false,
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
-  "C_Cpp_Runner.msvcSecureNoWarnings": false,
-  "files.associations": {
-    "pthread.h": "c",
-    "philo.h": "c",
-    "unistd.h": "c",
-    "stdio.h": "c",
-    "time.h": "c",
-    "stdlib.h": "c",
-    "fcntl.h": "c",
-    "semaphore.h": "c",
-    "signal.h": "c",
-    "philo_bonus.h": "c"
-  }
+  "C_Cpp_Runner.msvcSecureNoWarnings": false
 }

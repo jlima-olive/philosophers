@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/12 04:18:29 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/12 04:33:50 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct s_philo
 	int 			time_to_eat;
 	int 			time_to_sleep;
 	int 			ammout_eaten;
+	sem_t			*update_vars;
 	sem_t			*eaten_sem;
 	sem_t			*talk_perms;
 	sem_t			*dead;

@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/12 04:23:24 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/12 04:25:08 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ void	*hypervisor(void *var)
 	{
 		if (last_time_ate(philo) >= philo->time_to_die)
 		{
+			sem_wait(philo->talk_perms);
 			printf("%ld %d died\n", total_time() / KILO, philo->nbr);
 			exit(sem_post(philo->dead));
 		}

@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_helpers1.c                                      :+:      :+:    :+:   */
+/*   ft_helpers.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:52:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/12 02:47:39 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/12 04:18:54 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo_bonus.h"
 
-long total_time(void)
+long	total_time(void)
 {
 	static int flag;
 	static struct timeval start;
@@ -29,7 +29,7 @@ long total_time(void)
 	return (ret);
 }
 
-long last_time_ate(t_philo *philo)
+long	last_time_ate(t_philo *philo)
 {
 	struct timeval curr;
 	long ret;
@@ -40,19 +40,17 @@ long last_time_ate(t_philo *philo)
 	return (ret);
 }
 
-void increment_eating(t_philo *philo)
+void	better_sleep(t_philo *philo, long time_to_sleep)
 {
-	pthread_mutex_lock(&philo->eat_mutex);
-	philo->times_ate++;
-	pthread_mutex_unlock(&philo->eat_mutex);
-}
+	long time;
 
-int all_alive(t_philo *philo)
-{
-	int ret;
-
-	pthread_mutex_lock(philo->info_mutex);
-	ret = *philo->all_alive;
-	pthread_mutex_unlock(philo->info_mutex);
-	return (ret);
+	time = total_time();
+	while (total_time() - time < time_to_sleep - 101)
+	{
+		gettimeofday(&philo->lta, NULL);
+		usleep(100);
+	}
+	time_to_sleep = time_to_sleep - (total_time() - time);
+	if (time_to_sleep > 0)
+		usleep(time_to_sleep);
 }

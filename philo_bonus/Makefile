@@ -6,7 +6,7 @@
 #    By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/12 13:07:24 by jlima-so          #+#    #+#              #
-#    Updated: 2025/09/10 18:49:59 by jlima-so         ###   ########.fr        #
+#    Updated: 2025/09/12 04:17:04 by jlima-so         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,12 +30,8 @@ AUX_DIR=aux_dir/
 
 #OBJ_LIB=	${SRC_LIB:.c=.o}
 
-SRC_FILES=  $(wildcard *.c) \
+SRC_BONUS=  $(wildcard *.c) \
 			$(wildcard */*.c)
-
-OBJ_FILES=	${SRC_FILES:.c=.o}
-
-SRC_BONUS=	$(wildcard ${BONUS_DIR}*.c)
 
 OBJ_BONUS=	${SRC_BONUS:.c=.o}
 

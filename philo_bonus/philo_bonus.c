@@ -6,14 +6,15 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/12 02:40:42 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/12 04:23:24 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-int init_philo(int ac, char **av, t_philo *philo)
+int	init_philo(int ac, char **av, t_philo *philo)
 {
+	philo->nbr = 1;
 	philo->nbr_of_philo = ft_atoi(av[1]);
 	philo->time_to_die = ft_atoi(av[2]) * KILO;
 	philo->time_to_eat = ft_atoi(av[3]) * KILO;
@@ -24,7 +25,7 @@ int init_philo(int ac, char **av, t_philo *philo)
 	return (0);
 }
 
-int exit_message(t_philo *philo, int ac)
+int	exit_message(t_philo *philo, int ac)
 {
 	write(2, "invalid number of philosophers\n",
 		  (philo->nbr_of_philo <= 0) * 32);
@@ -39,53 +40,44 @@ int exit_message(t_philo *philo, int ac)
 				(philo->notepme <= 0) && ac > 5);
 }
 
-void *run_code(t_philo *philo)
+void	*hypervisor(void *var)
 {
-	if (philo->nbr_of_philo == 1)
+	t_philo	*philo;
+
+	philo = (t_philo *)var;
+	while (1)
 	{
-		usleep(philo->time_to_die);
-		return (printf("%ld 1 died\n", total_time() / KILO), NULL);
-	}
-	gettimeofday(&philo->lta, NULL);
-	while (all_alive(philo))
-	{
-		if (go_eat(philo))
-			return (NULL);
-		if (philo->notepme != -1 && check_times_ate(philo, philo->notepme))
-			return (NULL);
-		if (go_sleep(philo) || go_think(philo))
-			return (NULL);
+		if (last_time_ate(philo) >= philo->time_to_die)
+		{
+			printf("%ld %d died\n", total_time() / KILO, philo->nbr);
+			exit(sem_post(philo->dead));
+		}
 	}
 	return (NULL);
 }
 
-int init_infosophers(t_philo *philo)
+void	*run_code(t_philo *philo)
 {
-	int	*pid;
-	int	ind;
+	pthread_t	thread_id;
 
-	pid = malloc((philo->nbr_of_philo) * sizeof(int));
-	if (pid == NULL)
-		return (1);
-	ind = -1;
-	total_time();
-	while (++ind < philo->nbr_of_philo)
+	if (philo->nbr_of_philo == 1)
 	{
-		pid[ind] = fork();
-		if (pid[ind] == -1)
-		{
-			kill(0, SIGKILL);
-			free(pid);
-			exit(0);
-		}
-		if (pid[ind] == 0)
-			run_code(philo);
+		usleep(philo->time_to_die);
+		printf("%ld 1 died\n", total_time() / KILO);
+		return (NULL);
 	}
-	printf("check1\n");
-	sem_wait(philo->dead);
-	kill(0, SIGKILL);
-	printf("check2\n");
-	return (free(pid), 0);
+	gettimeofday(&philo->lta, NULL);
+	if (pthread_create(&thread_id, NULL, hypervisor, philo))
+		exit(sem_post(philo->dead));
+	while (1)
+	{
+		go_eat(philo);
+		if (philo->ammout_eaten == philo->notepme)
+			sem_post(philo->eaten_sem);
+		go_sleep(philo);
+		go_think(philo);
+	}
+	return (NULL);
 }
 
 int	unlink_all_sem(void)
@@ -95,6 +87,54 @@ int	unlink_all_sem(void)
 	sem_unlink("/spoons");
 	sem_unlink("/getting_spoons");
 	return (1);
+}
+
+void	*wait_to_close(void *var)
+{
+	int		ind;
+	t_philo *philo;
+
+	philo = (t_philo *)var;
+	ind = philo->nbr_of_philo;
+	while (ind--)
+		sem_wait(philo->eaten_sem);
+	kill(0, SIGKILL);
+	sem_close(philo->talk_perms);
+	sem_close(philo->dead);
+	sem_close(philo->spoons);
+	sem_close(philo->getting_spoons);
+	unlink_all_sem();
+	return (NULL);
+}
+
+void	init_infosophers(t_philo *philo)
+{
+	pthread_t	thread_id;
+	int			pid[200];
+	int			ind;
+
+	if (pid == NULL)
+		return ;
+	ind = -1;
+	total_time();
+	while (++ind < philo->nbr_of_philo)
+	{
+		pid[ind] = fork();
+		if (pid[ind] == -1)
+		{
+			kill(0, SIGKILL);
+			exit(0);
+		}
+		if (pid[ind] == 0)
+			run_code(philo);
+		philo->nbr++;
+	}
+	if (philo->notepme != -1 && pthread_create(&thread_id, NULL, wait_to_close, philo))
+		exit(sem_post(philo->dead));
+	printf("check1\n");
+	sem_wait(philo->dead);
+	kill(0, SIGKILL);
+	printf("check2\n");
 }
 
 int	open_all_sem(t_philo *philo)
@@ -115,9 +155,10 @@ int	open_all_sem(t_philo *philo)
 	sem_open("/getting_spoons", O_CREAT, 0660, philo->nbr_of_philo / 2);
 	if (philo->getting_spoons == SEM_FAILED)
 		return (unlink_all_sem());
+	return (0);
 }
 
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
 	t_philo	philo;
 
@@ -137,12 +178,11 @@ int main(int ac, char **av)
 		return (1);
 	printf("\nstarting now\n");
 	init_infosophers(&philo);
-	sem_close(&philo.talk_perms);
-	sem_close(&philo.dead);
-	sem_close(&philo.spoons);
-	sem_close(&philo.getting_spoons);
-	if (unlink_all_sem());
-		return (1);
+	sem_close(philo.talk_perms);
+	sem_close(philo.dead);
+	sem_close(philo.spoons);
+	sem_close(philo.getting_spoons);
+	unlink_all_sem();
 	return (0);
 }
 

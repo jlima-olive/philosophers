@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/12 04:25:08 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/12 17:07:02 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,9 +67,12 @@ void	*run_code(t_philo *philo)
 		printf("%ld 1 died\n", total_time() / KILO);
 		return (NULL);
 	}
+	sem_wait(philo->info);
 	gettimeofday(&philo->lta, NULL);
+	sem_post(philo->info);
 	if (pthread_create(&thread_id, NULL, hypervisor, philo))
 		exit(sem_post(philo->dead));
+	pthread_detach(thread_id);
 	while (1)
 	{
 		go_eat(philo);
@@ -83,10 +86,12 @@ void	*run_code(t_philo *philo)
 
 int	unlink_all_sem(void)
 {
+	sem_unlink("/eaten_sem");
 	sem_unlink("/talk_perms");
 	sem_unlink("/dead");
 	sem_unlink("/spoons");
 	sem_unlink("/getting_spoons");
+	sem_unlink("/info");
 	return (1);
 }
 
@@ -132,6 +137,7 @@ void	init_infosophers(t_philo *philo)
 	}
 	if (philo->notepme != -1 && pthread_create(&thread_id, NULL, wait_to_close, philo))
 		exit(sem_post(philo->dead));
+	pthread_detach(thread_id);
 	printf("check1\n");
 	sem_wait(philo->dead);
 	kill(0, SIGKILL);
@@ -156,6 +162,14 @@ int	open_all_sem(t_philo *philo)
 	sem_open("/getting_spoons", O_CREAT, 0660, philo->nbr_of_philo / 2);
 	if (philo->getting_spoons == SEM_FAILED)
 		return (unlink_all_sem());
+	philo->eaten_sem = \
+	sem_open("/eaten_sem", O_CREAT, 0660, 0);
+	if (philo->eaten_sem == SEM_FAILED)
+		return (unlink_all_sem());
+	philo->info = \
+	sem_open("/info", O_CREAT, 0660, 1);
+	if (philo->info == SEM_FAILED)
+		return (unlink_all_sem());
 	return (0);
 }
 
@@ -179,7 +193,9 @@ int	main(int ac, char **av)
 		return (1);
 	printf("\nstarting now\n");
 	init_infosophers(&philo);
+	sem_close(philo.eaten_sem);
 	sem_close(philo.talk_perms);
+	sem_close(philo.info);
 	sem_close(philo.dead);
 	sem_close(philo.spoons);
 	sem_close(philo.getting_spoons);

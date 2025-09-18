@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:08:25 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 14:25:06 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@
 
 typedef struct s_info
 {
-	int nbr_of_philo;
-	int notepme;
-	int time_to_die;
-	int time_to_eat;
-	int time_to_sleep;
-	int talk_perms;
-	int all_alive;
-
+	int				nbr_of_philo;
+	int				notepme;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				talk_perms;
+	int				all_alive;
+	pthread_mutex_t	grab_spoons;
 } t_info;
 
 typedef struct s_philo
@@ -53,8 +53,10 @@ typedef struct s_philo
 	struct timeval	lta;
 	pthread_mutex_t	left_eat_mutex;
 	pthread_mutex_t	eat_mutex;
+	pthread_mutex_t	grab_spoons;
 	int				*left_spoon;
 	int				spoon;
+	int				not_here;
 	int				times_ate;
 	int				waiting_to_eat;
 	pthread_mutex_t	*info_mutex;

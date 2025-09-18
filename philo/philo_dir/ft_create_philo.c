@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_create_philo.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:24:54 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 14:33:28 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,11 @@ t_philo *ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 	new->alive = 1;
 	new->spoon = 0;
 	new->times_ate = 0;
+	new->not_here = 1;
 	new->waiting_to_eat = 1;
 	new->talk_perms = &info->talk_perms;
 	new->all_alive = &info->all_alive;
+	new->grab_spoons = info->grab_spoons;
 	return (new);
 }
 

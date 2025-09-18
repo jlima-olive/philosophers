@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:25:05 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 14:32:10 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,10 @@ void *run_code(void *var)
 	notepme = philo->info->notepme;
 	time_to_die = philo->info->time_to_die;
 	pthread_mutex_unlock(philo->info_mutex);
+	pthread_mutex_lock(&philo->eat_mutex);
 	gettimeofday(&philo->lta, NULL);
+	philo->not_here = 0;
+	pthread_mutex_unlock(&philo->eat_mutex);
 	while (all_alive(philo))
 	{
 		if (go_eat(philo, time_to_die))
@@ -110,6 +113,8 @@ int main(int ac, char **av)
 		return (1);
 	if (pthread_mutex_init(&info_mutex, NULL))
 		return (1);
+	if (pthread_mutex_init(&info.grab_spoons, NULL))
+		return (pthread_mutex_destroy(&info_mutex), 1);
 	init_infosophers(&info, &info_mutex);
 	pthread_mutex_destroy(&info_mutex);
 	return (0);

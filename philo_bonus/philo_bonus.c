@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/12 17:07:02 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 12:48:45 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	*run_code(t_philo *philo)
 
 	if (philo->nbr_of_philo == 1)
 	{
-		usleep(philo->time_to_die);
+		better_sleep(philo->time_to_die);
 		printf("%ld 1 died\n", total_time() / KILO);
 		return (NULL);
 	}
@@ -119,8 +119,6 @@ void	init_infosophers(t_philo *philo)
 	int			pid[200];
 	int			ind;
 
-	if (pid == NULL)
-		return ;
 	ind = -1;
 	total_time();
 	while (++ind < philo->nbr_of_philo)
@@ -135,13 +133,13 @@ void	init_infosophers(t_philo *philo)
 			run_code(philo);
 		philo->nbr++;
 	}
-	if (philo->notepme != -1 && pthread_create(&thread_id, NULL, wait_to_close, philo))
+	if (pthread_create(&thread_id, NULL, wait_to_close, philo))
 		exit(sem_post(philo->dead));
 	pthread_detach(thread_id);
-	printf("check1\n");
+	// printf("check1\n");
 	sem_wait(philo->dead);
 	kill(0, SIGKILL);
-	printf("check2\n");
+	// printf("check2\n");
 }
 
 int	open_all_sem(t_philo *philo)

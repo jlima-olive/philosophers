@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+         #
+#    By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/12 13:07:24 by jlima-so          #+#    #+#              #
-#    Updated: 2025/09/10 18:49:59 by jlima-so         ###   ########.fr        #
+#    Updated: 2025/09/18 10:35:20 by jlima-so         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,7 +53,7 @@ CC=cc
 
 AR=ar rcs
 
-CFLAGS= -pthread -g -Wall -Wextra -Werror -h -s
+CFLAGS= -pthread -Wall -Wextra -Werror
 
 all: ${PROJ}
 

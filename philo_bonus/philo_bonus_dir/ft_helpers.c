@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_helpers.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:52:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/12 16:53:43 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 12:48:45 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,19 +44,15 @@ long	last_time_ate(t_philo *philo)
 	return (ret);
 }
 
-void	better_sleep(t_philo *philo, long time_to_sleep)
+int better_sleep(long time_to_sleep)
 {
 	long time;
 
 	time = total_time();
-	while (total_time() - time < time_to_sleep - 101)
-	{
-		sem_wait(philo->info);
-		gettimeofday(&philo->lta, NULL);
-		sem_post(philo->info);
-		usleep(100);
-	}
+	while (total_time() - time < time_to_sleep - 10)
+		better_sleep(10);
 	time_to_sleep = time_to_sleep - (total_time() - time);
 	if (time_to_sleep > 0)
-		usleep(time_to_sleep);
+		better_sleep(time_to_sleep);
+	return (0);
 }

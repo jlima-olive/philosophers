@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_hypervisor.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:24:57 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 14:33:02 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-static void allow_to_eat(t_philo *philo)
+/* static void allow_to_eat(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->left_eat_mutex);
 	pthread_mutex_lock(&philo->eat_mutex);
@@ -85,26 +85,36 @@ static void eat_perm(t_philo *philo, const t_info *info, int flag)
 		allow_to_eat(philo);
 		last = !last;
 	}
-}
+} */
 
 void *hypervise(t_philo *philo, t_info *info, pthread_mutex_t *info_mutex)
 {
-	int flag;
+	int	ttd;
 
-	flag = philo->left->nbr;
-	if (flag == 1)
-		return (NULL);
-	flag = flag % 2;
 	pthread_mutex_lock(philo->info_mutex);
-	while (info->all_alive)
-	{
-		pthread_mutex_unlock(info_mutex);
-		eat_perm(philo, info, flag);
-		usleep(1);
-		eat_perm(philo->right, info, flag);
-		usleep(1);
-		pthread_mutex_lock(info_mutex);
-	}
+	ttd = info->time_to_die;
 	pthread_mutex_unlock(info_mutex);
+	pthread_mutex_lock(&philo->left->eat_mutex);
+	while (philo->left->not_here)
+	{
+		pthread_mutex_unlock(&philo->left->eat_mutex);
+		usleep(1);	
+		pthread_mutex_lock(&philo->left->eat_mutex);
+	}
+	pthread_mutex_unlock(&philo->left->eat_mutex);
+	while (1)
+	{
+		if (last_time_ate(philo) > ttd)
+		{
+			wait_to_talk(philo, __LONG_MAX__);
+			pthread_mutex_lock(philo->info_mutex);
+			ttd = *philo->all_alive = 0;
+			printf("%ld %d died\n", total_time() / KILO, philo->nbr);
+			pthread_mutex_unlock(info_mutex);
+			let_other_talk(philo);
+			return (NULL);
+		}
+		philo = philo->right;
+	}
 	return (NULL);
 }

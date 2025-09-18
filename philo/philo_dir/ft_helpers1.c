@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_helpers1.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:52:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:24:55 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 14:09:18 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,9 @@ long last_time_ate(t_philo *philo)
 	struct timeval curr;
 	long ret;
 
+	pthread_mutex_lock(&philo->eat_mutex);
 	gettimeofday(&curr, NULL);
+	pthread_mutex_unlock(&philo->eat_mutex);
 	ret = MEGA * curr.tv_sec + curr.tv_usec;
 	ret = ret - (MEGA * philo->lta.tv_sec + philo->lta.tv_usec);
 	return (ret);

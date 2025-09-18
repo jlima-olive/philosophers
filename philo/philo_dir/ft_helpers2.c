@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_helpers2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 19:01:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:24:56 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 14:11:43 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,17 @@ int better_usleep(t_philo *philo, long time_to_sleep, int flag)
 	long time;
 
 	time = total_time();
-	while (total_time() - time < time_to_sleep - 100)
+	while (total_time() - time < time_to_sleep - 10)
 	{
-		usleep(100);
+		usleep(10);
 		if (all_alive(philo) == 0)
 			return (1);
+		if (flag)
+		{
+			pthread_mutex_lock(&philo->eat_mutex);
+			gettimeofday(&philo->lta, NULL);
+			pthread_mutex_unlock(&philo->eat_mutex);
+		}
 		if (flag == 0 && last_time_ate(philo) > philo->info->time_to_die)
 			start_dying(philo);
 	}

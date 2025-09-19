@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
+/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/18 12:48:45 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 22:17:18 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,9 @@ void	*hypervisor(void *var)
 	{
 		if (last_time_ate(philo) >= philo->time_to_die)
 		{
+			// printf("\t\t\t%ld %d died\n", total_time() / KILO, philo->nbr);
 			sem_wait(philo->talk_perms);
-			printf("%ld %d died\n", total_time() / KILO, philo->nbr);
+			printf("\t\t\t%ld %d died\n", total_time() / KILO, philo->nbr);
 			exit(sem_post(philo->dead));
 		}
 	}
@@ -63,7 +64,7 @@ void	*run_code(t_philo *philo)
 
 	if (philo->nbr_of_philo == 1)
 	{
-		better_sleep(philo->time_to_die);
+		usleep(philo->time_to_die);
 		printf("%ld 1 died\n", total_time() / KILO);
 		return (NULL);
 	}
@@ -92,6 +93,16 @@ int	unlink_all_sem(void)
 	sem_unlink("/spoons");
 	sem_unlink("/getting_spoons");
 	sem_unlink("/info");
+	sem_unlink("/0");
+	sem_unlink("/1");
+	sem_unlink("/2");
+	sem_unlink("/3");
+	sem_unlink("/4");
+	sem_unlink("/5");
+	sem_unlink("/6");
+	sem_unlink("/7");
+	sem_unlink("/8");
+	sem_unlink("/9");
 	return (1);
 }
 
@@ -113,7 +124,24 @@ void	*wait_to_close(void *var)
 	return (NULL);
 }
 
-void	init_infosophers(t_philo *philo)
+/* sem_t	*get_info(t_philo *philo, int ind, int total)
+{
+	char	str[3];
+	
+	str[0] = '/';
+	str[1] = '0' + ind / 10;
+	str[2] = '\0';
+	sem_unlink(str);
+	if (ind / 10 != total / 10)
+		philo->info = sem_open("/eaten_sea", O_CREAT, 0660, total / 10);
+	if (ind / 10 != total / 10)
+		philo->info = sem_open("/eaten_sea", O_CREAT, 0660, total / 10);
+	if (philo->info == SEM_FAILED)
+		return (unlink_all_sem(), NULL);
+	return (philo->info);
+} */
+
+void	init_infosophers(t_philo *philo, sem_t	**info)
 {
 	pthread_t	thread_id;
 	int			pid[200];
@@ -123,6 +151,7 @@ void	init_infosophers(t_philo *philo)
 	total_time();
 	while (++ind < philo->nbr_of_philo)
 	{
+		philo->info = info[ind % 10];
 		pid[ind] = fork();
 		if (pid[ind] == -1)
 		{
@@ -157,23 +186,39 @@ int	open_all_sem(t_philo *philo)
 	if (philo->spoons == SEM_FAILED)
 		return (unlink_all_sem());
 	philo->getting_spoons = \
-	sem_open("/getting_spoons", O_CREAT, 0660, philo->nbr_of_philo / 2);
+	sem_open("/getting_spoons", O_CREAT, 0660, philo->nbr_of_philo / 2 + 1);
 	if (philo->getting_spoons == SEM_FAILED)
 		return (unlink_all_sem());
 	philo->eaten_sem = \
 	sem_open("/eaten_sem", O_CREAT, 0660, 0);
 	if (philo->eaten_sem == SEM_FAILED)
 		return (unlink_all_sem());
-	philo->info = \
-	sem_open("/info", O_CREAT, 0660, 1);
-	if (philo->info == SEM_FAILED)
-		return (unlink_all_sem());
 	return (0);
+}
+
+sem_t	**open_sem(void)
+{
+	sem_t	**info;
+	char	str[3];
+	int		ind;
+
+	str[0] = '/';
+	info = malloc(sizeof(sem_t *) * 10);
+	str[2] = '\0';
+	ind = -1;
+	while (++ind < 10)
+	{
+		str[1] = '0' + ind / 10;
+		sem_unlink(str);
+		info[ind / 10] = sem_open(str, O_CREAT, 0660, 1);
+	}
+	return (info);
 }
 
 int	main(int ac, char **av)
 {
 	t_philo	philo;
+	sem_t	**info;
 
 	if (ac != 5 && ac != 6)
 		return (write(2, "invalid number of arguments\n", 28));
@@ -186,11 +231,12 @@ int	main(int ac, char **av)
 	printf("time_to_eat:%d\n", philo.time_to_eat / KILO);
 	printf("time_to_sleep:%d\n", philo.time_to_sleep / KILO);
 	printf("notepme:%d\n", philo.notepme);
+	info = open_sem();
 	unlink_all_sem();
 	if (open_all_sem(&philo))
 		return (1);
 	printf("\nstarting now\n");
-	init_infosophers(&philo);
+	init_infosophers(&philo, info);
 	sem_close(philo.eaten_sem);
 	sem_close(philo.talk_perms);
 	sem_close(philo.info);

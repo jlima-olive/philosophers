@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
+/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/18 14:32:10 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/19 02:24:44 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,64 +45,55 @@ int exit_message(t_info *info, int ac)
 void *run_code(void *var)
 {
 	t_philo *philo;
-	int time_to_die;
-	int notepme;
 
 	philo = (t_philo *)var;
-	if (philo->info->nbr_of_philo == 1)
-	{
-		usleep(philo->info->time_to_die);
-		return (printf("%ld 1 died\n", total_time() / KILO), NULL);
-	}
-	pthread_mutex_lock(philo->info_mutex);
-	notepme = philo->info->notepme;
-	time_to_die = philo->info->time_to_die;
-	pthread_mutex_unlock(philo->info_mutex);
-	pthread_mutex_lock(&philo->eat_mutex);
 	gettimeofday(&philo->lta, NULL);
-	philo->not_here = 0;
-	pthread_mutex_unlock(&philo->eat_mutex);
+	// pthread_mutex_lock(philo->alive_mutex);
+	// pthread_mutex_unlock(philo->alive_mutex);
+	// printf("%ld exiting\n", total_time() / KILO);
+	// return (NULL);
+	if (philo->nbr % 2 == 0)
+		usleep(20);
 	while (all_alive(philo))
 	{
-		if (go_eat(philo, time_to_die))
+		if (go_eat(philo))
 			return (NULL);
-		if (notepme != -1 && check_times_ate(philo, notepme))
+		// if (philo->notepme != -1 && check_times_ate(philo, philo->notepme))
+			// return (NULL);
+		if (go_sleep(philo))
 			return (NULL);
-		if (go_sleep(philo, time_to_die) || go_think(philo, time_to_die))
+		if (go_think(philo))
 			return (NULL);
 	}
 	return (NULL);
 }
 
-int init_infosophers(t_info *info, pthread_mutex_t *info_mutex)
+int init_infosophers(t_info *info)
 {
-	int ind;
-	t_philo *philo;
-	pthread_t *nof;
+	int			ind;
+	t_philo		*philo;
+	pthread_t	nof[200];
 
-	nof = malloc((info->nbr_of_philo + 1) * sizeof(pthread_t));
-	if (nof == NULL)
-		return (1);
-	philo = init_philo_and_mutex(info->nbr_of_philo, info, info_mutex);
+	philo = init_philo_and_mutex(info->nbr_of_philo, info);
 	if (philo == NULL)
-		return (free(nof), 1);
+		return (1);
 	ind = -1;
 	total_time();
 	while (++ind < info->nbr_of_philo)
 	{
 		if (pthread_create(nof + ind, NULL, run_code, philo))
-			return (ft_philoclear(philo), free(nof), 1);
+			return (ft_philoclear(philo), 1);
 		philo = philo->right;
 	}
-	hypervise(philo, info, info_mutex);
+	usleep(20);
+	hypervise(philo);
 	while (ind-- > 0)
 		pthread_join(nof[ind], NULL);
-	return (free(nof), ft_philoclear(philo), 0);
+	return (ft_philoclear(philo), 0);
 }
 
 int main(int ac, char **av)
 {
-	pthread_mutex_t info_mutex;
 	t_info info;
 
 	if (ac != 5 && ac != 6)
@@ -111,12 +102,13 @@ int main(int ac, char **av)
 		return (1);
 	if (exit_message(&info, ac))
 		return (1);
-	if (pthread_mutex_init(&info_mutex, NULL))
+	if (pthread_mutex_init(&info.talk_mutex, NULL))
 		return (1);
-	if (pthread_mutex_init(&info.grab_spoons, NULL))
-		return (pthread_mutex_destroy(&info_mutex), 1);
-	init_infosophers(&info, &info_mutex);
-	pthread_mutex_destroy(&info_mutex);
+	if (pthread_mutex_init(&info.alive_mutex, NULL))
+		return (pthread_mutex_destroy(&info.talk_mutex), 1);
+	init_infosophers(&info);
+	pthread_mutex_destroy(&info.talk_mutex);
+	pthread_mutex_destroy(&info.alive_mutex);
 	return (0);
 }
 

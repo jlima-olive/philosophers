@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
+/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/18 12:49:38 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/18 18:09:16 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ float ft_atof(const char *str);
 // in str goes the string to turn into an int
 int ft_atoi(const char *str);
 
-int		better_sleep(long time_to_sleep);
+int		better_sleep(t_philo *philo, long time_to_sleep, int flag);
 int		init_philo(int ac, char **av, t_philo *philo);
 int		exit_message(t_philo *philo, int ac);
 long 	last_time_ate(t_philo *philo);

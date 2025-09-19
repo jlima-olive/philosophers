@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_create_philo.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
+/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/18 14:33:28 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/19 02:20:16 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,22 @@ t_philo *ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 	new = malloc(sizeof(t_philo));
 	if (new == NULL)
 		return (NULL);
-	if (pthread_mutex_init(&new->eat_mutex, NULL))
+	new->spoon1 = malloc(sizeof(pthread_mutex_t));
+	if (pthread_mutex_init(new->spoon1, NULL))
 		return (free(new), NULL);
 	new->nbr = nbr;
 	new->right = right;
 	new->left = left;
-	new->info = info;
-	new->alive = 1;
-	new->spoon = 0;
-	new->times_ate = 0;
-	new->not_here = 1;
-	new->waiting_to_eat = 1;
+	new->eating = 0;
+	new->time_to_sleep = info->time_to_sleep;
+	new->nbr_of_philo = info->nbr_of_philo;
+	new->time_to_eat = info->time_to_eat;
+	new->time_to_die = info->time_to_die;
 	new->talk_perms = &info->talk_perms;
+	new->talk_mutex = &info->talk_mutex;
 	new->all_alive = &info->all_alive;
-	new->grab_spoons = info->grab_spoons;
+	new->alive_mutex = &info->alive_mutex;
+	new->notepme = info->notepme;
 	return (new);
 }
 
@@ -40,28 +42,45 @@ void ft_philoclear(t_philo *philo)
 {
 	if (philo == NULL)
 		return;
-	if (philo->nbr != philo->info->nbr_of_philo)
+	if (philo->nbr != philo->nbr_of_philo)
 		ft_philoclear(philo->right);
-	pthread_mutex_destroy(&philo->eat_mutex);
+	if (philo->nbr % 2)
+		pthread_mutex_destroy(philo->spoon2);
+	else
+		pthread_mutex_destroy(philo->spoon1);
 	free(philo);
 }
 
-void last_cicle(t_philo *philo)
+void	last_cicle(t_philo *philo)
 {
-	philo->left_eat_mutex = philo->left->eat_mutex;
-	philo->left_spoon = &philo->left->spoon;
-	if (philo->nbr != philo->info->nbr_of_philo)
+	philo->spoon2 = philo->left->spoon1;
+	if (philo->nbr != philo->nbr_of_philo)
 		last_cicle(philo->left);
 }
 
-t_philo *init_philo_and_mutex(int nbr, t_info *info, pthread_mutex_t *mutex)
+void	ft_ult_swap(pthread_mutex_t *p1, pthread_mutex_t *p2)
+{
+	pthread_mutex_t	temp;
+
+	temp = *p1;
+	*p1 = *p2;
+	*p2 = temp;
+}
+
+void	reverse_forks(t_philo *philo)
+{
+	if (philo->nbr % 2)
+		ft_ult_swap(philo->spoon1, philo->spoon2);
+	if (philo->nbr != philo->nbr_of_philo)
+		last_cicle(philo->left);
+}
+t_philo *init_philo_and_mutex(int nbr, t_info *info)
 {
 	t_philo *philo;
 	t_philo *head;
 	int ind;
 
 	philo = ft_philonew(NULL, NULL, 1, info);
-	philo->info_mutex = mutex;
 	if (philo == NULL)
 		return (NULL);
 	head = philo;
@@ -71,14 +90,13 @@ t_philo *init_philo_and_mutex(int nbr, t_info *info, pthread_mutex_t *mutex)
 		philo->right = ft_philonew(philo, NULL, ind, info);
 		if (philo->right == NULL)
 			return (ft_philoclear(head), NULL);
-		philo->right->info_mutex = mutex;
 		philo = philo->right;
 	}
 	philo->right = ft_philonew(philo, head, nbr, info);
 	if (philo->right == NULL)
 		return (ft_philoclear(head), NULL);
-	philo->right->info_mutex = mutex;
 	head->left = philo->right;
 	last_cicle(philo);
+	reverse_forks(philo);
 	return (head);
 }

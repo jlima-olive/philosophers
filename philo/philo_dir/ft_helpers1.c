@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_helpers1.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+        */
+/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:52:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/18 14:09:18 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/09/19 02:50:10 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,27 +34,20 @@ long last_time_ate(t_philo *philo)
 	struct timeval curr;
 	long ret;
 
-	pthread_mutex_lock(&philo->eat_mutex);
 	gettimeofday(&curr, NULL);
-	pthread_mutex_unlock(&philo->eat_mutex);
 	ret = MEGA * curr.tv_sec + curr.tv_usec;
+	pthread_mutex_lock(&philo->eating_mutex);
 	ret = ret - (MEGA * philo->lta.tv_sec + philo->lta.tv_usec);
+	pthread_mutex_unlock(&philo->eating_mutex);
 	return (ret);
-}
-
-void increment_eating(t_philo *philo)
-{
-	pthread_mutex_lock(&philo->eat_mutex);
-	philo->times_ate++;
-	pthread_mutex_unlock(&philo->eat_mutex);
 }
 
 int all_alive(t_philo *philo)
 {
 	int ret;
 
-	pthread_mutex_lock(philo->info_mutex);
+	pthread_mutex_lock(philo->alive_mutex);
 	ret = *philo->all_alive;
-	pthread_mutex_unlock(philo->info_mutex);
+	pthread_mutex_unlock(philo->alive_mutex);
 	return (ret);
 }

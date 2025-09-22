@@ -6,7 +6,7 @@
 /*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:52:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/18 20:09:14 by namejojo         ###   ########.fr       */
+/*   Updated: 2025/09/23 00:04:48 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,27 +36,20 @@ long	last_time_ate(t_philo *philo)
 
 	gettimeofday(&curr, NULL);
 	ret = MEGA * curr.tv_sec + curr.tv_usec;
-	sem_wait(philo->info);
+	// sem_wait(philo->info);
+	while (philo->eating);	
 	ret = ret - (MEGA * philo->lta.tv_sec + philo->lta.tv_usec);
-	sem_post(philo->info);
+	// sem_post(philo->info);
 	return (ret);
 }
 
-int	better_sleep(t_philo *philo, long time_to_sleep, int flag)
+int	better_sleep(long time_to_sleep)
 {
 	long time;
 
 	time = total_time();
 	while (total_time() - time < time_to_sleep - 10)
-	{
-		if (flag)
-		{
-			sem_wait(philo->info);
-			gettimeofday(&philo->lta, NULL);
-			sem_post(philo->info);
-		}
 		usleep(10);
-	}
 	time_to_sleep = time_to_sleep - (total_time() - time);
 	if (time_to_sleep > 0)
 		usleep(time_to_sleep);

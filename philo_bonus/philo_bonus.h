@@ -6,7 +6,7 @@
 /*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/18 18:09:16 by namejojo         ###   ########.fr       */
+/*   Updated: 2025/09/22 15:32:00 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ typedef struct s_philo
 	int 			time_to_die;
 	int 			time_to_eat;
 	int 			time_to_sleep;
-	int 			ammout_eaten;
 	sem_t			*info;
 	sem_t			*eaten_sem;
 	sem_t			*talk_perms;
@@ -50,7 +49,8 @@ typedef struct s_philo
 	sem_t			*getting_spoons;
 	int				nbr;
 	struct timeval	lta;
-	// int				times_ate;
+	_Atomic int		times_ate;
+	_Atomic int		eating;
 } t_philo;
 
 // in str goes the string to turn into a float
@@ -58,7 +58,7 @@ float ft_atof(const char *str);
 // in str goes the string to turn into an int
 int ft_atoi(const char *str);
 
-int		better_sleep(t_philo *philo, long time_to_sleep, int flag);
+int		better_sleep(long time_to_sleep);
 int		init_philo(int ac, char **av, t_philo *philo);
 int		exit_message(t_philo *philo, int ac);
 long 	last_time_ate(t_philo *philo);

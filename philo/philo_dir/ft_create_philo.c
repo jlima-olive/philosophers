@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_create_philo.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/19 02:20:16 by namejojo         ###   ########.fr       */
+/*   Updated: 2025/10/28 12:29:27 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,12 @@ void ft_philoclear(t_philo *philo)
 {
 	if (philo == NULL)
 		return;
+	if (philo->nbr_of_philo == 1)
+	{
+		pthread_mutex_destroy(philo->spoon1);
+		free(philo);
+		return ;
+	}
 	if (philo->nbr != philo->nbr_of_philo)
 		ft_philoclear(philo->right);
 	if (philo->nbr % 2)
@@ -96,7 +102,9 @@ t_philo *init_philo_and_mutex(int nbr, t_info *info)
 	if (philo->right == NULL)
 		return (ft_philoclear(head), NULL);
 	head->left = philo->right;
-	last_cicle(philo);
-	reverse_forks(philo);
+	if (philo->nbr_of_philo != 1)
+		last_cicle(philo);
+	if (philo->nbr_of_philo != 1)
+		reverse_forks(philo);
 	return (head);
 }

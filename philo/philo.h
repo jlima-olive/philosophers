@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/19 02:50:01 by namejojo         ###   ########.fr       */
+/*   Updated: 2025/10/28 12:32:11 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ void ft_putnbr_fd(int nbr, int fd);
 // writes string str into file descriptor fd
 void ft_putstr_fd(char *str, int fd);
 
-void	hypervise(t_philo *philo);
+void	hypervise(t_philo *philo, long ttd);
 t_philo *init_philo_and_mutex(int nbr, t_info *info);
 int better_usleep(t_philo *philo, long time_to_sleep);
 int wait_to_eat(t_philo *philo);

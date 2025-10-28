@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/19 02:24:44 by namejojo         ###   ########.fr       */
+/*   Updated: 2025/10/28 12:34:49 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,19 +47,19 @@ void *run_code(void *var)
 	t_philo *philo;
 
 	philo = (t_philo *)var;
+	if (philo->nbr_of_philo == 1)
+	{
+		usleep(philo->time_to_die);
+		printf("%d %d died\n", philo->time_to_die / KILO, philo->nbr);
+		return (NULL);
+	}
 	gettimeofday(&philo->lta, NULL);
-	// pthread_mutex_lock(philo->alive_mutex);
-	// pthread_mutex_unlock(philo->alive_mutex);
-	// printf("%ld exiting\n", total_time() / KILO);
-	// return (NULL);
 	if (philo->nbr % 2 == 0)
 		usleep(20);
 	while (all_alive(philo))
 	{
 		if (go_eat(philo))
 			return (NULL);
-		// if (philo->notepme != -1 && check_times_ate(philo, philo->notepme))
-			// return (NULL);
 		if (go_sleep(philo))
 			return (NULL);
 		if (go_think(philo))
@@ -85,8 +85,7 @@ int init_infosophers(t_info *info)
 			return (ft_philoclear(philo), 1);
 		philo = philo->right;
 	}
-	usleep(20);
-	hypervise(philo);
+	hypervise(philo, 0);
 	while (ind-- > 0)
 		pthread_join(nof[ind], NULL);
 	return (ft_philoclear(philo), 0);

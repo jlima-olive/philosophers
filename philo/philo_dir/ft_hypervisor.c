@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/28 12:35:13 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/28 12:35:58 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	hypervise(t_philo *philo, long ttd)
 	ttd = philo->time_to_die;
 	eating_mutex = &philo->eating_mutex;
 	alive_mutex = philo->alive_mutex;
-	while (1)
+	while (*alive)
 	{
 			if (philo->eating == 0 && last_time_ate(philo) > ttd)
 			{

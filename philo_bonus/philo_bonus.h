@@ -6,7 +6,7 @@
 /*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/22 15:32:00 by namejojo         ###   ########.fr       */
+/*   Updated: 2025/09/23 13:58:56 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ typedef struct s_philo
 	int 			time_to_die;
 	int 			time_to_eat;
 	int 			time_to_sleep;
-	sem_t			*info;
 	sem_t			*eaten_sem;
 	sem_t			*talk_perms;
 	sem_t			*dead;

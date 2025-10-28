@@ -6,7 +6,7 @@
 /*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/23 00:08:12 by namejojo         ###   ########.fr       */
+/*   Updated: 2025/09/23 14:02:41 by namejojo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ int	init_philo(int ac, char **av, t_philo *philo)
 	philo->time_to_sleep = ft_atoi(av[4]) * KILO;
 	philo->notepme = -1;
 	philo->eating = 0;
+	philo->times_ate = 0;
 	if (ac > 5)
 		philo->notepme = ft_atoi(av[5]);
 	return (0);
@@ -48,11 +49,13 @@ void	*hypervisor(void *var)
 	philo = (t_philo *)var;
 	while (1)
 	{
-		usleep (10);
+		// usleep(100);
+		// printf("loop\n");
 		if (philo->eating == 0 && last_time_ate(philo) >= philo->time_to_die)
 		{
 			// printf("\t\t\t%ld %d died\n", total_time() / KILO, philo->nbr);
 			// printf("\t\t\t%ld %d died\n", total_time() / KILO, philo->nbr);
+			printf("\t\t\t%ld %d died\n", total_time() / KILO, philo->nbr);
 			sem_wait(philo->talk_perms);
 			printf("\t\t\t%ld %d died\n", total_time() / KILO, philo->nbr);
 			exit(sem_post(philo->dead));
@@ -71,8 +74,7 @@ void	*run_code(t_philo *philo)
 		printf("%ld 1 died\n", total_time() / KILO);
 		return (NULL);
 	}
-	// printf("init %d here\n", philo->nbr);
-	// printf("we are %d\n", philo->nbr);
+	gettimeofday(&philo->lta, NULL);
 	if (pthread_create(&thread_id, NULL, hypervisor, philo))
 		exit(sem_post(philo->dead));
 	pthread_detach(thread_id);
@@ -83,14 +85,15 @@ void	*run_code(t_philo *philo)
 			sem_post(philo->eaten_sem);
 		go_sleep(philo);
 		go_think(philo);
+		exit(0); 
 	}
 	return (NULL);
 }
 
-int	unlink_all_sem(int count)
+int	unlink_all_sem(void)
 {
-	int		ind;
-	char	str[5];
+	/* int		ind;
+	char	str[5]; */
 
 	sem_unlink("/eaten_sem");
 	sem_unlink("/talk_perms");
@@ -98,7 +101,7 @@ int	unlink_all_sem(int count)
 	sem_unlink("/spoons");
 	sem_unlink("/getting_spoons");
 
-	str[0] = '/';
+	/* str[0] = '/';
 	str[4] = '\0';
 	ind = 0;
 	while (++ind < count)
@@ -107,7 +110,7 @@ int	unlink_all_sem(int count)
 		str[2] = ind / 10 % 10 + 48;
 		str[3] = ind % 10 + 48;
 		sem_unlink(str);
-	}
+	} */
 	return (1);
 }
 
@@ -125,7 +128,7 @@ void	*wait_to_close(void *var)
 	sem_close(philo->dead);
 	sem_close(philo->spoons);
 	sem_close(philo->getting_spoons);
-	unlink_all_sem(philo->nbr_of_philo);
+	unlink_all_sem();
 	exit(0);
 	return (NULL);
 }
@@ -147,32 +150,14 @@ void	*wait_to_close(void *var)
 	return (philo->info);
 } */
 
-int	get_info(t_philo *philo)
-{
-	char	str[5];
-
-	str[0] = '/';
-	str[4] = '\0';
-	str[1] = philo->nbr / 100 % 10 + 48;
-	str[2] = philo->nbr / 10 % 10 + 48;
-	str[3] = philo->nbr % 10 + 48;
-	// sem_unlink(str);
-	// printf("%d is opening %s\n", philo->nbr, str);
-	philo->info = sem_open(str, O_CREAT, 0660, 1);
-	if (philo->info == SEM_FAILED)
-		return (unlink_all_sem(philo->nbr), 1);
-	return (0);
-}
-
 void	init_infosophers(t_philo *philo)
 {
-	pthread_t	thread_id;
+	// pthread_t	thread_id;
 	int			pid[200];
 	int			ind;
 
 	ind = -1;
 	total_time();
-	gettimeofday(&philo->lta, NULL);
 	while (++ind < philo->nbr_of_philo)
 	{
 		pid[ind] = fork();
@@ -182,20 +167,11 @@ void	init_infosophers(t_philo *philo)
 			exit(0);
 		}
 		if (pid[ind] == 0)
-		{
-			if (get_info(philo))
-				return ;
 			run_code(philo);
-		}
 		philo->nbr++;
 	}
-	if (pthread_create(&thread_id, NULL, wait_to_close, philo))
-		exit(sem_post(philo->dead));
-	pthread_detach(thread_id);
-	// printf("check1\n");
 	sem_wait(philo->dead);
 	kill(0, SIGKILL);
-	// printf("check2\n");
 }
 
 int	open_all_sem(t_philo *philo)
@@ -207,39 +183,20 @@ int	open_all_sem(t_philo *philo)
 	philo->dead = \
 	sem_open("/dead", O_CREAT, 0660, 0);
 	if (philo->dead == SEM_FAILED)
-		return (unlink_all_sem(0));
+		return (unlink_all_sem());
 	philo->spoons = \
 	sem_open("/spoons", O_CREAT, 0660, philo->nbr_of_philo);
 	if (philo->spoons == SEM_FAILED)
-		return (unlink_all_sem(0));
+		return (unlink_all_sem());
 	philo->getting_spoons = \
 	sem_open("/getting_spoons", O_CREAT, 0660, philo->nbr_of_philo / 2);
 	if (philo->getting_spoons == SEM_FAILED)
-		return (unlink_all_sem(0));
+		return (unlink_all_sem());
 	philo->eaten_sem = \
 	sem_open("/eaten_sem", O_CREAT, 0660, 0);
 	if (philo->eaten_sem == SEM_FAILED)
-		return (unlink_all_sem(0));
+		return (unlink_all_sem());
 	return (0);
-}
-
-sem_t	**open_sem(void)
-{
-	sem_t	**info;
-	char	str[3];
-	int		ind;
-
-	str[0] = '/';
-	info = malloc(sizeof(sem_t *) * 10);
-	str[2] = '\0';
-	ind = -1;
-	while (++ind < 10)
-	{
-		str[1] = '0' + ind / 10;
-		sem_unlink(str);
-		info[ind / 10] = sem_open(str, O_CREAT, 0660, 1);
-	}
-	return (info);
 }
 
 int	main(int ac, char **av)
@@ -257,18 +214,17 @@ int	main(int ac, char **av)
 	printf("time_to_eat:%d\n", philo.time_to_eat / KILO);
 	printf("time_to_sleep:%d\n", philo.time_to_sleep / KILO);
 	printf("notepme:%d\n", philo.notepme);
-	unlink_all_sem(0);
+	unlink_all_sem();
 	if (open_all_sem(&philo))
 		return (1);
 	printf("\nstarting now\n");
 	init_infosophers(&philo);
 	sem_close(philo.eaten_sem);
 	sem_close(philo.talk_perms);
-	sem_close(philo.info);
 	sem_close(philo.dead);
 	sem_close(philo.spoons);
 	sem_close(philo.getting_spoons);
-	unlink_all_sem(philo.nbr_of_philo);
+	unlink_all_sem();
 	return (0);
 }
 

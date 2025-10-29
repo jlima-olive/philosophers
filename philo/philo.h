@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 20:29:09 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 23:28:41 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,6 +100,7 @@ void	drop_spoon(t_philo *philo);
 // void start_dying(t_philo *philo);
 int any_dead(t_philo *philo);
 long total_time(void);
+void	use_single_syscal(int time, int nbr, char *msg);
 
 int init_info(int ac, char **av, t_info *info);
 int exit_message(t_info *info, int ac);

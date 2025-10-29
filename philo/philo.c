@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 23:19:02 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 23:32:32 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int	init_infosophers(t_info *info)
 		philo = philo->right;
 	}
 	usleep(100);
-	// info->init = 1;
+	info->init = 1;
 	if (philo->nbr_of_philo != 1)
 		hypervise(philo, 0);
 	while (ind-- > 0)

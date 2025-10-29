@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 23:13:47 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 23:44:52 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,8 +118,9 @@ int	go_eat(t_philo *philo)
 	return (0);
 }
 
-int		go_sleep(t_philo *philo)
+int	go_sleep(t_philo *philo)
 {
+	usleep(200);
 	pthread_mutex_lock(philo->dead_mutex);
 	if (*philo->dead == 0)
 	{

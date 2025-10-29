@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 19:01:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 18:35:11 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 23:20:56 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,7 @@ int better_usleep(t_philo *philo, long time_to_sleep)
 			return (pthread_mutex_unlock(philo->dead_mutex), 1);
 		pthread_mutex_unlock(philo->dead_mutex);
 		if (last_time_ate(philo) > philo->time_to_die)
-		{
-			printf("\t\t\t\t\there2 %d?\n", *philo->dead);
 			return (1);
-		}
 	}
 	time_to_sleep = time_to_sleep - (total_time() - time);
 	if (time_to_sleep > 0)

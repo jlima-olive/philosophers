@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 16:28:27 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 19:42:54 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ typedef struct s_philo
 	int				eating;
 	pthread_mutex_t	eating_mutex;
 	_Atomic int		*init;
-
 	struct s_philo	*left;
 	struct s_philo	*right;
 	struct timeval	lta;
@@ -95,7 +94,7 @@ int		go_eat(t_philo *philo);
 void	increment_eating(t_philo *philo);
 void	let_other_talk(t_philo *philo);
 long	last_time_ate(t_philo *philo);
-void	grab_spoon(t_philo *philo);
+int		grab_spoon(t_philo *philo);
 void	drop_spoon(t_philo *philo);
 // void start_dying(t_philo *philo);
 int any_dead(t_philo *philo);

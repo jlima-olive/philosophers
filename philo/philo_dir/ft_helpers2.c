@@ -6,18 +6,11 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 19:01:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 16:37:54 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 18:35:11 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
-/* 
-void let_other_talk(t_philo *philo)
-{
-	pthread_mutex_lock(philo->talk_mutex);
-	*philo->talk_perms = 1;
-	pthread_mutex_unlock(philo->talk_mutex);
-} */
 
 int better_usleep(t_philo *philo, long time_to_sleep)
 {
@@ -28,11 +21,14 @@ int better_usleep(t_philo *philo, long time_to_sleep)
 	{
 		usleep(10);
 		pthread_mutex_lock(philo->dead_mutex);
-		if (*philo->dead == 0)
+		if (*philo->dead)
 			return (pthread_mutex_unlock(philo->dead_mutex), 1);
 		pthread_mutex_unlock(philo->dead_mutex);
 		if (last_time_ate(philo) > philo->time_to_die)
+		{
+			printf("\t\t\t\t\there2 %d?\n", *philo->dead);
 			return (1);
+		}
 	}
 	time_to_sleep = time_to_sleep - (total_time() - time);
 	if (time_to_sleep > 0)

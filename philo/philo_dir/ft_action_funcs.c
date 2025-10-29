@@ -6,58 +6,62 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 03:07:09 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 16:56:42 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-int	all_alive(t_philo *philo)
+int	any_dead(t_philo *philo)
 {
 	int	ret;
 	
-	pthread_mutex_lock(philo->alive_mutex);
-	ret = *philo->alive;
-	pthread_mutex_unlock(philo->alive_mutex);
+	pthread_mutex_lock(philo->dead_mutex);
+	ret = *philo->dead;
+	pthread_mutex_unlock(philo->dead_mutex);
 	return (ret);
 }
 
 int	go_eat(t_philo *philo)
 {
 	grab_spoon(philo);
-	pthread_mutex_lock(philo->talk_mutex);
-	if (last_time_ate(philo) > philo->time_to_die || all_alive(philo) == 0)
+	if (last_time_ate(philo) > philo->time_to_die)
 	{
-		// pthread_mutex_lock(philo->alive_mutex);
-		// *philo->alive = 0;
-		// pthread_mutex_unlock(philo->alive_mutex);
-		pthread_mutex_unlock(philo->talk_mutex);
-		drop_spoon(philo);
-		return (1);
+		pthread_mutex_lock(philo->dead_mutex);
+		if (*philo->dead == 0)
+			*philo->dead = philo->nbr;
+		pthread_mutex_unlock(philo->dead_mutex);
+		return (drop_spoon(philo), 1);
 	}
 	pthread_mutex_lock(&philo->eating_mutex);
 	philo->eating = 1;
 	gettimeofday(&philo->lta, NULL);
 	pthread_mutex_unlock(&philo->eating_mutex);
-	printf("%ld %d has taken a fork\n", total_time() / KILO, philo->nbr);
-	printf("%ld %d has taken a fork\n", total_time() / KILO, philo->nbr);
-	printf("%ld %d is eating\n", total_time() / KILO, philo->nbr);
-	pthread_mutex_unlock(philo->talk_mutex);
-	if (better_usleep(philo, philo->time_to_eat))
+	pthread_mutex_lock(philo->dead_mutex);
+	if (*philo->dead == 0)
 	{
-		pthread_mutex_lock(philo->alive_mutex);
-		*philo->alive = 0;
-		pthread_mutex_unlock(philo->alive_mutex);
-		pthread_mutex_lock(&philo->eating_mutex);
-		philo->eating = 0;
-		pthread_mutex_unlock(&philo->eating_mutex);
-		return (drop_spoon(philo), 1);
+		pthread_mutex_unlock(philo->dead_mutex);
+		pthread_mutex_lock(philo->talk_mutex);
+		printf("%ld %d has taken a fork\n", total_time() / KILO, philo->nbr);
+		printf("%ld %d has taken a fork\n", total_time() / KILO, philo->nbr);
+		printf("%ld %d is eating\n", total_time() / KILO, philo->nbr);
+		pthread_mutex_unlock(philo->talk_mutex);
 	}
-	drop_spoon(philo);
+	else
+		return (drop_spoon(philo), pthread_mutex_unlock(philo->dead_mutex), 1);
 	pthread_mutex_lock(&philo->eating_mutex);
 	philo->eating = 0;
 	gettimeofday(&philo->lta, NULL);
 	pthread_mutex_unlock(&philo->eating_mutex);
+	if (better_usleep(philo, philo->time_to_eat))
+	{
+		pthread_mutex_lock(philo->dead_mutex);
+		if (*philo->dead == 0)
+			*philo->dead = philo->nbr;
+		pthread_mutex_unlock(philo->dead_mutex);
+		return (drop_spoon(philo), 1);
+	}
+	drop_spoon(philo);
 	philo->times_ate++;
 	return (0);
 }
@@ -65,15 +69,15 @@ int	go_eat(t_philo *philo)
 int	go_sleep(t_philo *philo)
 {
 	pthread_mutex_lock(philo->talk_mutex);
-	if (last_time_ate(philo) > philo->time_to_die)
+	pthread_mutex_lock(philo->dead_mutex);
+	if (last_time_ate(philo) > philo->time_to_die || *philo->dead)
 	{
-		pthread_mutex_lock(philo->alive_mutex);
-		*philo->alive = 0;
-		pthread_mutex_unlock(philo->alive_mutex);
-		pthread_mutex_unlock(philo->talk_mutex);
+		if (*philo->dead == 0)
+			*philo->dead = philo->nbr;
+		pthread_mutex_unlock(philo->dead_mutex);
 		return (1);
 	}
-	if (*philo->alive)
+	if (*philo->dead)
 		printf("%ld %d is sleeping\n", total_time() / KILO, philo->nbr);
 	else
 		return (pthread_mutex_unlock(philo->talk_mutex), 1);
@@ -89,25 +93,27 @@ int go_think(t_philo *philo)
 
 	time = philo->time_to_eat - last_time_ate(philo);
 	pthread_mutex_lock(philo->talk_mutex);
-	if (last_time_ate(philo) > philo->time_to_die)
+	pthread_mutex_lock(philo->dead_mutex);
+	if (last_time_ate(philo) > philo->time_to_die || *philo->dead)
 	{
-		pthread_mutex_lock(philo->alive_mutex);
-		*philo->alive = 0;
-		pthread_mutex_unlock(philo->alive_mutex);
+		if (*philo->dead == 0)
+			*philo->dead = 0;
+		pthread_mutex_unlock(philo->dead_mutex);
 		pthread_mutex_unlock(philo->talk_mutex);
 		return (1);
 	}
-	if (*philo->alive)
-		printf("%ld %d is thinking\n", total_time() / KILO, philo->nbr);
 	if (time > 0 && better_usleep(philo, time))
 	{
-		pthread_mutex_lock(philo->alive_mutex);
-		*philo->alive = 0;
-		pthread_mutex_unlock(philo->alive_mutex);
+		printf("%ld %d is thinking\n", total_time() / KILO, philo->nbr);
+		pthread_mutex_lock(philo->dead_mutex);
+		if (*philo->dead == 0)
+			*philo->dead = philo->nbr;
+		pthread_mutex_unlock(philo->dead_mutex);
 		pthread_mutex_unlock(philo->talk_mutex);
 		return (1);
 	}
-	pthread_mutex_unlock(philo->talk_mutex);
+	else
+		pthread_mutex_unlock(philo->talk_mutex);
 	return (0);
 }
 

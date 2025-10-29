@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 03:03:25 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 16:28:05 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,9 @@ int init_info(int ac, char **av, t_info *info)
 	info->notepme = -1;
 	if (ac > 5)
 		info->notepme = ft_atoi(av[5]);
-	info->alive = 1;
-	info->talk = 1;
+	info->dead = 0;
 	info->init = 0;
+	info->talk = 1;
 	return (0);
 }
 
@@ -58,7 +58,7 @@ void *run_code(void *var)
 	while (*philo->init == 0);
 	if (philo->nbr % 2 == 0)
 		usleep(50);
-	while (*philo->alive)
+	while (1)
 	{
 		if (go_eat(philo))
 			return (NULL);
@@ -80,15 +80,16 @@ int	init_infosophers(t_info *info)
 	if (philo == NULL)
 		return (1);
 	ind = -1;
-	total_time();
 	while (++ind < info->nbr_of_philo)
 	{
 		if (pthread_create(nof + ind, NULL, run_code, philo))
 			return (ft_philoclear(philo), 1);
 		philo = philo->right;
 	}
+	total_time();
 	info->init = 1;
-	hypervise(philo, 0);
+	if (philo->nbr_of_philo != 1)
+		hypervise(philo, 0);
 	while (ind-- > 0)
 		pthread_join(nof[ind], NULL);
 	return (ft_philoclear(philo), 0);
@@ -104,10 +105,10 @@ int main(int ac, char **av)
 		return (1);
 	if (exit_message(&info, ac))
 		return (1);
-	if (pthread_mutex_init(&info.alive_mutex, NULL))
+	if (pthread_mutex_init(&info.dead_mutex, NULL))
 		return (1);
 	if (pthread_mutex_init(&info.talk_mutex, NULL))
-		return (pthread_mutex_destroy(&info.alive_mutex), 1);
+		return (pthread_mutex_destroy(&info.dead_mutex), 1);
 	printf("\nnbr_of_philo %d", info.nbr_of_philo);
 	printf("\ntime_to_die %d", info.time_to_die);
 	printf("\ntime_to_eat %d", info.time_to_eat);

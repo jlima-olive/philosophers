@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:52:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 02:47:12 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 16:28:27 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,13 @@ long last_time_ate(t_philo *philo)
 	return (ret);
 }
 /* 
-int all_alive(t_philo *philo)
+int any_dead(t_philo *philo)
 {
 	int ret;
 
-	pthread_mutex_lock(philo->alive_mutex);
-	ret = *philo->all_alive;
-	pthread_mutex_unlock(philo->alive_mutex);
+	pthread_mutex_lock(philo->dead_mutex);
+	ret = *philo->any_dead;
+	pthread_mutex_unlock(philo->dead_mutex);
 	return (ret);
 }
  */

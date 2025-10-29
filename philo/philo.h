@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 02:07:45 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 16:28:27 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ typedef struct s_info
 	int				time_to_sleep;
 	int				talk;
 	pthread_mutex_t	talk_mutex;
-	int				alive;
-	pthread_mutex_t	alive_mutex;
+	int				dead;
+	pthread_mutex_t	dead_mutex;
 	_Atomic int		init;
 } t_info;
 
@@ -55,8 +55,8 @@ typedef struct s_philo
 	int				nbr;
 	int				*talk;
 	pthread_mutex_t	*talk_mutex;
-	int				*alive;
-	pthread_mutex_t	*alive_mutex;
+	int				*dead;
+	pthread_mutex_t	*dead_mutex;
 	int				eating;
 	pthread_mutex_t	eating_mutex;
 	_Atomic int		*init;
@@ -98,7 +98,7 @@ long	last_time_ate(t_philo *philo);
 void	grab_spoon(t_philo *philo);
 void	drop_spoon(t_philo *philo);
 // void start_dying(t_philo *philo);
-int all_alive(t_philo *philo);
+int any_dead(t_philo *philo);
 long total_time(void);
 
 int init_info(int ac, char **av, t_info *info);

@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 02:38:51 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 03:07:09 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,12 @@ int	go_eat(t_philo *philo)
 	pthread_mutex_lock(philo->talk_mutex);
 	if (last_time_ate(philo) > philo->time_to_die || all_alive(philo) == 0)
 	{
-		pthread_mutex_lock(philo->alive_mutex);
-		*philo->alive = 0;
-		pthread_mutex_unlock(philo->alive_mutex);
+		// pthread_mutex_lock(philo->alive_mutex);
+		// *philo->alive = 0;
+		// pthread_mutex_unlock(philo->alive_mutex);
+		pthread_mutex_unlock(philo->talk_mutex);
 		drop_spoon(philo);
-		return (pthread_mutex_unlock(philo->talk_mutex), 1);
+		return (1);
 	}
 	pthread_mutex_lock(&philo->eating_mutex);
 	philo->eating = 1;
@@ -58,7 +59,7 @@ int	go_eat(t_philo *philo)
 	gettimeofday(&philo->lta, NULL);
 	pthread_mutex_unlock(&philo->eating_mutex);
 	philo->times_ate++;
-	return (*philo->alive);
+	return (0);
 }
 
 int	go_sleep(t_philo *philo)
@@ -103,8 +104,10 @@ int go_think(t_philo *philo)
 		pthread_mutex_lock(philo->alive_mutex);
 		*philo->alive = 0;
 		pthread_mutex_unlock(philo->alive_mutex);
+		pthread_mutex_unlock(philo->talk_mutex);
 		return (1);
 	}
+	pthread_mutex_unlock(philo->talk_mutex);
 	return (0);
 }
 

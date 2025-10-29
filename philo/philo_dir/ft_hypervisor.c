@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 02:51:06 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 03:05:44 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,10 @@ void	hypervise(t_philo *philo, long ttd)
 	{
 		if (last_time_ate(philo) > ttd)
 		{
-			printf("philo%d\n\t\t\t%ld > %ld\n",philo->nbr, last_time_ate(philo), ttd);
-			pthread_mutex_unlock(&philo->eating_mutex);
 			pthread_mutex_lock(philo->alive_mutex);
 			*alive = 0;
 			pthread_mutex_unlock(philo->alive_mutex);
+			printf("philo%d\n\t\t\t%ld > %ld\n",philo->nbr, last_time_ate(philo), ttd);
 			pthread_mutex_lock(philo->talk_mutex);
 			printf("%ld %d died\n", total_time() / KILO, philo->nbr);
 			pthread_mutex_unlock(philo->talk_mutex);

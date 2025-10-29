@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 19:05:45 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 21:21:23 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,9 @@ void	hypervise(t_philo *philo, long ttd)
 	while (1)
 	{
 		pthread_mutex_lock(philo->dead_mutex);
-		if (last_time_ate(philo) > ttd || *philo->dead)
+		if (last_time_ate(philo) > ttd)
 		{
-			if (*philo->dead == 0)
-				*philo->dead = philo->nbr;
+			*philo->dead = philo->nbr;
 			print = *philo->dead;
 			pthread_mutex_unlock(philo->dead_mutex);
 			pthread_mutex_lock(philo->talk_mutex);
@@ -37,6 +36,7 @@ void	hypervise(t_philo *philo, long ttd)
 			return ;
 		}
 		pthread_mutex_unlock(philo->dead_mutex);
+		if (philo->nbr == philo->nbr_of_philo)
 		philo = philo->right;
 	}
 }

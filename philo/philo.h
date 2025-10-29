@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 19:42:54 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 20:29:09 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,8 @@ typedef struct s_philo
 	pthread_mutex_t	*talk_mutex;
 	int				*dead;
 	pthread_mutex_t	*dead_mutex;
-	int				eating;
+	// int				eating;
+	_Atomic int		eating;
 	pthread_mutex_t	eating_mutex;
 	_Atomic int		*init;
 	struct s_philo	*left;

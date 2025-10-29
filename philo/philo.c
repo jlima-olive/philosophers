@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/28 12:34:49 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 02:46:13 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,9 @@ int init_info(int ac, char **av, t_info *info)
 	info->notepme = -1;
 	if (ac > 5)
 		info->notepme = ft_atoi(av[5]);
-	info->all_alive = 1;
-	info->talk_perms = 1;
+	info->alive = 1;
+	info->talk = 1;
+	info->init = 0;
 	return (0);
 }
 
@@ -50,13 +51,14 @@ void *run_code(void *var)
 	if (philo->nbr_of_philo == 1)
 	{
 		usleep(philo->time_to_die);
-		printf("%d %d died\n", philo->time_to_die / KILO, philo->nbr);
+		printf("%d 1 died\n", philo->time_to_die / KILO);
 		return (NULL);
 	}
 	gettimeofday(&philo->lta, NULL);
+	while (*philo->init == 0);
 	if (philo->nbr % 2 == 0)
-		usleep(20);
-	while (all_alive(philo))
+		usleep(50);
+	while (*philo->alive)
 	{
 		if (go_eat(philo))
 			return (NULL);
@@ -68,13 +70,13 @@ void *run_code(void *var)
 	return (NULL);
 }
 
-int init_infosophers(t_info *info)
+int	init_infosophers(t_info *info)
 {
 	int			ind;
 	t_philo		*philo;
 	pthread_t	nof[200];
 
-	philo = init_philo_and_mutex(info->nbr_of_philo, info);
+	philo = init_philo_and_mutex(info);
 	if (philo == NULL)
 		return (1);
 	ind = -1;
@@ -85,6 +87,7 @@ int init_infosophers(t_info *info)
 			return (ft_philoclear(philo), 1);
 		philo = philo->right;
 	}
+	info->init = 1;
 	hypervise(philo, 0);
 	while (ind-- > 0)
 		pthread_join(nof[ind], NULL);
@@ -101,13 +104,15 @@ int main(int ac, char **av)
 		return (1);
 	if (exit_message(&info, ac))
 		return (1);
-	if (pthread_mutex_init(&info.talk_mutex, NULL))
-		return (1);
 	if (pthread_mutex_init(&info.alive_mutex, NULL))
-		return (pthread_mutex_destroy(&info.talk_mutex), 1);
+		return (1);
+	if (pthread_mutex_init(&info.talk_mutex, NULL))
+		return (pthread_mutex_destroy(&info.alive_mutex), 1);
+	printf("\nnbr_of_philo %d", info.nbr_of_philo);
+	printf("\ntime_to_die %d", info.time_to_die);
+	printf("\ntime_to_eat %d", info.time_to_eat);
+	printf("\ntime_to_sleep %d\n", info.time_to_sleep);
 	init_infosophers(&info);
-	pthread_mutex_destroy(&info.talk_mutex);
-	pthread_mutex_destroy(&info.alive_mutex);
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/28 12:32:11 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 02:07:45 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,32 +37,35 @@ typedef struct s_info
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	int				talk_perms;
-	int				all_alive;
+	int				talk;
 	pthread_mutex_t	talk_mutex;
+	int				alive;
 	pthread_mutex_t	alive_mutex;
+	_Atomic int		init;
 } t_info;
 
 typedef struct s_philo
 {
+	int				times_ate;
 	int				nbr_of_philo;
-	int				notepme;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	int				*talk_perms;
-	int				*all_alive;
-	_Atomic int		eating;
+	int				notepme;
 	int				nbr;
+	int				*talk;
+	pthread_mutex_t	*talk_mutex;
+	int				*alive;
+	pthread_mutex_t	*alive_mutex;
+	int				eating;
+	pthread_mutex_t	eating_mutex;
+	_Atomic int		*init;
+
 	struct s_philo	*left;
 	struct s_philo	*right;
 	struct timeval	lta;
-	pthread_mutex_t	eating_mutex;
-	pthread_mutex_t	*alive_mutex;
-	pthread_mutex_t	*talk_mutex;
 	pthread_mutex_t	*spoon1;
 	pthread_mutex_t	*spoon2;
-	_Atomic int		times_ate;
 } t_philo;
 
 // in str goes the string to turn into a float
@@ -81,19 +84,19 @@ void ft_putnbr_fd(int nbr, int fd);
 void ft_putstr_fd(char *str, int fd);
 
 void	hypervise(t_philo *philo, long ttd);
-t_philo *init_philo_and_mutex(int nbr, t_info *info);
-int better_usleep(t_philo *philo, long time_to_sleep);
-int wait_to_eat(t_philo *philo);
-int wait_to_talk(t_philo *philo);
-int go_sleep(t_philo *philo);
-int go_think(t_philo *philo);
-int check_times_ate(t_philo *philo, int value);
-int go_eat(t_philo *philo);
-void increment_eating(t_philo *philo);
-void let_other_talk(t_philo *philo);
-long last_time_ate(t_philo *philo);
-void grab_spoon(t_philo *philo);
-void drop_spoon(t_philo *philo);
+t_philo	*init_philo_and_mutex(t_info *info);
+int		better_usleep(t_philo *philo, long time_to_sleep);
+int		wait_to_eat(t_philo *philo);
+int		wait_to_talk(t_philo *philo);
+int		go_sleep(t_philo *philo);
+int		go_think(t_philo *philo);
+int		check_times_ate(t_philo *philo, int value);
+int		go_eat(t_philo *philo);
+void	increment_eating(t_philo *philo);
+void	let_other_talk(t_philo *philo);
+long	last_time_ate(t_philo *philo);
+void	grab_spoon(t_philo *philo);
+void	drop_spoon(t_philo *philo);
 // void start_dying(t_philo *philo);
 int all_alive(t_philo *philo);
 long total_time(void);

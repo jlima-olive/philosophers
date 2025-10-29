@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/28 12:29:27 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 02:46:56 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,19 +22,22 @@ t_philo *ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 	new->spoon1 = malloc(sizeof(pthread_mutex_t));
 	if (pthread_mutex_init(new->spoon1, NULL))
 		return (free(new), NULL);
-	new->nbr = nbr;
+	if (pthread_mutex_init(&new->eating_mutex, NULL))
+		return (pthread_mutex_destroy(new->spoon1), free(new), NULL);
 	new->right = right;
 	new->left = left;
-	new->eating = 0;
-	new->time_to_sleep = info->time_to_sleep;
+	new->nbr = nbr;
 	new->nbr_of_philo = info->nbr_of_philo;
-	new->time_to_eat = info->time_to_eat;
 	new->time_to_die = info->time_to_die;
-	new->talk_perms = &info->talk_perms;
-	new->talk_mutex = &info->talk_mutex;
-	new->all_alive = &info->all_alive;
-	new->alive_mutex = &info->alive_mutex;
+	new->time_to_eat = info->time_to_eat;
+	new->time_to_sleep = info->time_to_sleep;
 	new->notepme = info->notepme;
+	new->alive = &info->alive;
+	new->talk = &info->talk;
+	new->alive_mutex = &info->alive_mutex;
+	new->talk_mutex = &info->talk_mutex;
+	new->eating = 0;
+	new->init = &info->init;
 	return (new);
 }
 
@@ -54,11 +57,13 @@ void ft_philoclear(t_philo *philo)
 		pthread_mutex_destroy(philo->spoon2);
 	else
 		pthread_mutex_destroy(philo->spoon1);
+	pthread_mutex_destroy(&philo->eating_mutex);
 	free(philo);
 }
 
 void	last_cicle(t_philo *philo)
 {
+	philo->times_ate = 0;
 	philo->spoon2 = philo->left->spoon1;
 	if (philo->nbr != philo->nbr_of_philo)
 		last_cicle(philo->left);
@@ -80,7 +85,7 @@ void	reverse_forks(t_philo *philo)
 	if (philo->nbr != philo->nbr_of_philo)
 		last_cicle(philo->left);
 }
-t_philo *init_philo_and_mutex(int nbr, t_info *info)
+t_philo *init_philo_and_mutex(t_info *info)
 {
 	t_philo *philo;
 	t_philo *head;
@@ -91,14 +96,14 @@ t_philo *init_philo_and_mutex(int nbr, t_info *info)
 		return (NULL);
 	head = philo;
 	ind = 1;
-	while (++ind < nbr)
+	while (++ind < info->nbr_of_philo)
 	{
-		philo->right = ft_philonew(philo, NULL, ind, info);
+		philo->right = ft_philonew(philo, NULL, philo->nbr + 1, info);
 		if (philo->right == NULL)
 			return (ft_philoclear(head), NULL);
 		philo = philo->right;
 	}
-	philo->right = ft_philonew(philo, head, nbr, info);
+	philo->right = ft_philonew(philo, head, info->nbr_of_philo, info);
 	if (philo->right == NULL)
 		return (ft_philoclear(head), NULL);
 	head->left = philo->right;

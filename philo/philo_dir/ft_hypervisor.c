@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/28 12:35:58 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/29 02:51:06 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,28 @@
 
 void	hypervise(t_philo *philo, long ttd)
 {
-	int				*alive;
-	pthread_mutex_t	*eating_mutex;
-	pthread_mutex_t	*alive_mutex;
+	int	*alive;
 
 	if (philo->nbr_of_philo == 1)
 		return ;
-	usleep(1000);
-	alive = philo->all_alive;
+	alive = philo->alive;
 	ttd = philo->time_to_die;
-	eating_mutex = &philo->eating_mutex;
-	alive_mutex = philo->alive_mutex;
-	while (*alive)
+	while (*philo->init == 0);
+	usleep(1000);	
+	while (1)
 	{
-			if (philo->eating == 0 && last_time_ate(philo) > ttd)
-			{
-				pthread_mutex_lock(alive_mutex);
-				*alive = 0;
-				pthread_mutex_unlock(alive_mutex);
-				wait_to_talk(philo);
-				printf("%ld %d died\n", total_time() / KILO, philo->nbr);
-				return ;
-			}
-			pthread_mutex_unlock(eating_mutex);
+		if (last_time_ate(philo) > ttd)
+		{
+			printf("philo%d\n\t\t\t%ld > %ld\n",philo->nbr, last_time_ate(philo), ttd);
+			pthread_mutex_unlock(&philo->eating_mutex);
+			pthread_mutex_lock(philo->alive_mutex);
+			*alive = 0;
+			pthread_mutex_unlock(philo->alive_mutex);
+			pthread_mutex_lock(philo->talk_mutex);
+			printf("%ld %d died\n", total_time() / KILO, philo->nbr);
+			pthread_mutex_unlock(philo->talk_mutex);
+			return ;
+		}
 		philo = philo->right;
 	}
 }

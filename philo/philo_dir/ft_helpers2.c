@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   ft_helpers2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: namejojo <namejojo@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 19:01:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/19 02:28:09 by namejojo         ###   ########.fr       */
+/*   Updated: 2025/10/28 13:25:53 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
-
+/* 
 void let_other_talk(t_philo *philo)
 {
 	pthread_mutex_lock(philo->talk_mutex);
 	*philo->talk_perms = 1;
 	pthread_mutex_unlock(philo->talk_mutex);
-}
+} */
 
 int better_usleep(t_philo *philo, long time_to_sleep)
 {
@@ -27,10 +27,10 @@ int better_usleep(t_philo *philo, long time_to_sleep)
 	while (total_time() - time < time_to_sleep - 10)
 	{
 		usleep(10);
-		if (all_alive(philo) == 0)
-			return (/* start_dying(philo),  */1);
-		if (last_time_ate(philo) > philo->time_to_die)
-			return (/* start_dying(philo),  */1);
+		if (*philo->alive == 0)
+			return (1);
+		if (philo->eating == 0 && last_time_ate(philo) > philo->time_to_die)
+			return (1);
 	}
 	time_to_sleep = time_to_sleep - (total_time() - time);
 	if (time_to_sleep > 0)

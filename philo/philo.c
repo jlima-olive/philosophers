@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:18:37 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:34:29 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void *run_code(void *var)
 	while (philo->init == 0);
 	gettimeofday(&philo->lta, NULL);
 	if (philo->nbr % 2 == 0)
-		usleep(75);
+		usleep(200);
 	while (1)
 	{
 		if (go_eat(philo))
@@ -84,6 +84,8 @@ int	init_infosophers(t_info *info)
 			return (ft_philoclear(philo), 1);
 		philo = philo->right;
 	}
+	usleep(100);
+	total_time();
 	info->init = 1;
 	if (philo->nbr_of_philo != 1)
 		hypervise(philo);

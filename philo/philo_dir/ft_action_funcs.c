@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:22:17 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:32:56 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,8 +118,8 @@ int	go_eat(t_philo *philo)
 
 int	go_sleep(t_philo *philo)
 {
-	if (philo->nbr % 2)
-		usleep(500);
+	// if (philo->nbr % 2)
+		// usleep(100);
 	pthread_mutex_lock(philo->dead_mutex);
 	if (*philo->dead == 0)
 	{
@@ -128,31 +128,23 @@ int	go_sleep(t_philo *philo)
 	}
 	else
 		return (pthread_mutex_unlock(philo->dead_mutex), 1);
-	if (better_usleep(philo, philo->time_to_sleep - 500 * (philo->nbr % 2)))
+	if (better_usleep(philo, philo->time_to_sleep))
 		return (1);
 	return (0);
 }
 
 int go_think(t_philo *philo)
 {
-	long	time;
-
-	time = philo->time_to_die - last_time_ate(philo);
 	pthread_mutex_lock(philo->dead_mutex);
 	if (*philo->dead == 0)
 	{
-		if (time > 0)
-		{
-			use_single_syscal(total_time() / KILO, philo->nbr, " is thinking\n");
-			pthread_mutex_unlock(philo->dead_mutex);
-		}
-		else
-			pthread_mutex_unlock(philo->dead_mutex);
+		use_single_syscal(total_time() / KILO, philo->nbr, " is thinking\n");
+		pthread_mutex_unlock(philo->dead_mutex);
 	}
 	else
 		return (pthread_mutex_unlock(philo->dead_mutex), 1);
-	if (better_usleep(philo, KILO))
-		return (1);
+	// if (better_usleep(philo, KILO))
+		// return (1);
 	return (0);
 }
 

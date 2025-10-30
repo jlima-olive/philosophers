@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:10:14 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:25:35 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ void	reverse_forks(t_philo *philo)
 	if (philo->nbr != philo->nbr_of_philo)
 		last_cicle(philo->left);
 }
+
 t_philo *init_philo_and_mutex(t_info *info)
 {
 	t_philo *philo;

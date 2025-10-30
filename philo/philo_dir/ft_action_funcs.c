@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 03:55:25 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:22:17 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,8 @@ int	go_eat(t_philo *philo)
 		return (drop_spoon(philo), pthread_mutex_unlock(philo->dead_mutex), 1);
 	if (better_usleep(philo, philo->time_to_eat))
 		return (drop_spoon(philo), 1);
-	gettimeofday(&philo->lta, NULL);
 	drop_spoon(philo);
+	gettimeofday(&philo->lta, NULL);
 	philo->eating = 0;
 	philo->times_ate++;
 	return (0);
@@ -137,7 +137,7 @@ int go_think(t_philo *philo)
 {
 	long	time;
 
-	time = philo->time_to_die - last_time_ate(philo) - philo->nbr_of_philo * KILO;
+	time = philo->time_to_die - last_time_ate(philo);
 	pthread_mutex_lock(philo->dead_mutex);
 	if (*philo->dead == 0)
 	{
@@ -151,7 +151,7 @@ int go_think(t_philo *philo)
 	}
 	else
 		return (pthread_mutex_unlock(philo->dead_mutex), 1);
-	if (better_usleep(philo, time))
+	if (better_usleep(philo, KILO))
 		return (1);
 	return (0);
 }

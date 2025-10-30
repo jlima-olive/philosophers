@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:07:27 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:23:20 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	hypervise(t_philo *philo)
 	while (1)
 	{
 		pthread_mutex_lock(philo->dead_mutex);
-		if (last_time_ate(philo) > ttd)
+		if (last_time_ate(philo) >= ttd)
 		{
 			*philo->dead = philo->nbr;
 			use_single_syscal(total_time() / KILO, philo->nbr, " is dead\n");

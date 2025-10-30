@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 23:32:32 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:00:17 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ int exit_message(t_info *info, int ac)
 		write(2, "invalid number of times each philosopher must eat \n",
 			  (info->notepme <= 0) * 52);
 	return ((info->nbr_of_philo <= 0) + (info->time_to_die <= 0) +
-				(info->time_to_eat <= 0) + (info->time_to_sleep <= 0) +
-				(info->notepme <= 0) && ac > 5);
+			(info->time_to_eat <= 0) + (info->time_to_sleep <= 0) +
+			(info->notepme <= 0) && ac > 5);
 }
 
 void *run_code(void *var)
@@ -53,6 +53,8 @@ void *run_code(void *var)
 		printf("%d 1 died\n", philo->time_to_die / KILO);
 		return (NULL);
 	}
+	gettimeofday(&philo->lta, NULL);
+	while (*philo->init == 0);
 	gettimeofday(&philo->lta, NULL);
 	if (philo->nbr % 2 == 0)
 		usleep(50);
@@ -78,14 +80,13 @@ int	init_infosophers(t_info *info)
 	if (philo == NULL)
 		return (1);
 	ind = -1;
-	total_time();
 	while (++ind < info->nbr_of_philo)
 	{
 		if (pthread_create(nof + ind, NULL, run_code, philo))
 			return (ft_philoclear(philo), 1);
 		philo = philo->right;
 	}
-	usleep(100);
+	// usleep(250);
 	info->init = 1;
 	if (philo->nbr_of_philo != 1)
 		hypervise(philo, 0);

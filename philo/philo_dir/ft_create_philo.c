@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 18:56:00 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:10:14 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,6 @@ t_philo *ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 	new->spoon1 = malloc(sizeof(pthread_mutex_t));
 	if (pthread_mutex_init(new->spoon1, NULL))
 		return (free(new), NULL);
-	if (pthread_mutex_init(&new->eating_mutex, NULL))
-		return (pthread_mutex_destroy(new->spoon1), free(new), NULL);
 	new->right = right;
 	new->left = left;
 	new->nbr = nbr;
@@ -33,9 +31,7 @@ t_philo *ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 	new->time_to_sleep = info->time_to_sleep;
 	new->notepme = info->notepme;
 	new->dead = &info->dead;
-	new->talk = &info->talk;
 	new->dead_mutex = &info->dead_mutex;
-	new->talk_mutex = &info->talk_mutex;
 	new->eating = 0;
 	new->init = &info->init;
 	return (new);
@@ -57,7 +53,6 @@ void ft_philoclear(t_philo *philo)
 		pthread_mutex_destroy(philo->spoon2);
 	else
 		pthread_mutex_destroy(philo->spoon1);
-	pthread_mutex_destroy(&philo->eating_mutex);
 	free(philo);
 }
 

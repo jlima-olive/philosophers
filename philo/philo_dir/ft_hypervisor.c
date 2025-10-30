@@ -6,16 +6,18 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 03:54:14 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:07:27 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-void	hypervise(t_philo *philo, long ttd)
+void	hypervise(t_philo *philo)
 {
+	long	ttd;
+
+	usleep(philo->time_to_die - 999);
 	ttd = philo->time_to_die;
-	usleep(250);
 	while (1)
 	{
 		pthread_mutex_lock(philo->dead_mutex);

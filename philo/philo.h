@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/29 23:28:41 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:11:19 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,6 @@ typedef struct s_info
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
-	int				talk;
-	pthread_mutex_t	talk_mutex;
 	int				dead;
 	pthread_mutex_t	dead_mutex;
 	_Atomic int		init;
@@ -53,13 +51,9 @@ typedef struct s_philo
 	int				time_to_sleep;
 	int				notepme;
 	int				nbr;
-	int				*talk;
-	pthread_mutex_t	*talk_mutex;
 	int				*dead;
 	pthread_mutex_t	*dead_mutex;
-	// int				eating;
 	_Atomic int		eating;
-	pthread_mutex_t	eating_mutex;
 	_Atomic int		*init;
 	struct s_philo	*left;
 	struct s_philo	*right;
@@ -83,7 +77,7 @@ void ft_putnbr_fd(int nbr, int fd);
 // writes string str into file descriptor fd
 void ft_putstr_fd(char *str, int fd);
 
-void	hypervise(t_philo *philo, long ttd);
+void	hypervise(t_philo *philo);
 t_philo	*init_philo_and_mutex(t_info *info);
 int		better_usleep(t_philo *philo, long time_to_sleep);
 int		wait_to_eat(t_philo *philo);

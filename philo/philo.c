@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:34:29 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/10/30 04:38:59 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ int exit_message(t_info *info, int ac)
 			(info->notepme <= 0) && ac > 5);
 }
 
-void *run_code(void *var)
+void	*run_code(void *var)
 {
-	t_philo *philo;
+	t_philo	*philo;
 
 	philo = (t_philo *)var;
 	if (philo->nbr_of_philo == 1)

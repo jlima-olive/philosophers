@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:32:56 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/04 14:48:37 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,9 @@ int	go_eat(t_philo *philo)
 	if (better_usleep(philo, philo->time_to_eat))
 		return (drop_spoon(philo), 1);
 	drop_spoon(philo);
+	// pthread_mutex_lock(&philo->gettime);
 	gettimeofday(&philo->lta, NULL);
+	// pthread_mutex_unlock(&philo->gettime);
 	philo->eating = 0;
 	philo->times_ate++;
 	return (0);

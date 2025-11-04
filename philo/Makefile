@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jlima-so <jlima-so@student.42lisba.com>    +#+  +:+       +#+         #
+#    By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/06/12 13:07:24 by jlima-so          #+#    #+#              #
-#    Updated: 2025/09/18 10:35:20 by jlima-so         ###   ########.fr        #
+#    Updated: 2025/11/04 12:40:35 by jlima-so         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,15 +14,15 @@
 # MAKEFLAGS += --silent
 # endif
 
-PROJ=philo
+PROJ=		philo
 
 PROJ_BONUS=	${PROJ}_bonus
 
-DIR=${PROJ}_dir/
+DIR=		${PROJ}_dir/
 
-BONUS_DIR=${PROJ}_bonus_dir/
+BONUS_DIR=	${PROJ}_bonus_dir/
 
-AUX_DIR=aux_dir/
+AUX_DIR=	aux_dir/
 
 #SRC_LIB=	$(wildcard ${SRC_DIR1}*.c) \
 #			$(wildcard ${SRC_DIR2}*.c) \
@@ -39,22 +39,22 @@ SRC_BONUS=	$(wildcard ${BONUS_DIR}*.c)
 
 OBJ_BONUS=	${SRC_BONUS:.c=.o}
 
-NAME=${PROJ}.a
+NAME=		${PROJ}.a
 
-NAME_BONUS=${PROJ_BONUS}.a
+NAME_BONUS=	${PROJ_BONUS}.a
 
-LIBFT=libft.a
+LIBFT=		libft.a
 
-BONUS_ARQ=bonus.a
+BONUS_ARQ=	bonus.a
 
-HDR_FILE=libft.h
+HDR_FILE=	libft.h
 
-CC=cc
+CC=			cc
 
-AR=ar rcs
+AR=			ar rcs
 
-CFLAGS= -pthread -Wall -Wextra -Werror
-
+CFLAGS=		-pthread -s
+# -Wall -Wextra -Werror 
 all: ${PROJ}
 
 ${NAME}: ${OBJ_FILES}

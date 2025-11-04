@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:11:19 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/04 14:16:20 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,15 +52,18 @@ typedef struct s_philo
 	int				notepme;
 	int				nbr;
 	int				*dead;
+	int				swi;
 	pthread_mutex_t	*dead_mutex;
 	_Atomic int		eating;
 	_Atomic int		*init;
 	struct s_philo	*left;
 	struct s_philo	*right;
 	struct timeval	lta;
+	pthread_mutex_t	holder_spoon1;
 	pthread_mutex_t	*spoon1;
 	pthread_mutex_t	*spoon2;
-} t_philo;
+	pthread_mutex_t	gettime;
+}	t_philo;
 
 // in str goes the string to turn into a float
 float ft_atof(const char *str);
@@ -77,7 +80,7 @@ void ft_putnbr_fd(int nbr, int fd);
 // writes string str into file descriptor fd
 void ft_putstr_fd(char *str, int fd);
 
-void	hypervise(t_philo *philo);
+void	hypervise(t_philo *philo, long ttd);
 t_philo	*init_philo_and_mutex(t_info *info);
 int		better_usleep(t_philo *philo, long time_to_sleep);
 int		wait_to_eat(t_philo *philo);

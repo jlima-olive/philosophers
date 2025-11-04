@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:38:59 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/04 15:18:04 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,11 @@ void	*run_code(void *var)
 		printf("%d 1 died\n", philo->time_to_die / KILO);
 		return (NULL);
 	}
-	while (philo->init == 0);
+	while (philo->init == 0)
+		usleep(50);
+	// pthread_mutex_lock(&philo->gettime);
 	gettimeofday(&philo->lta, NULL);
+	// pthread_mutex_unlock(&philo->gettime);
 	if (philo->nbr % 2 == 0)
 		usleep(200);
 	while (1)
@@ -71,24 +74,27 @@ void	*run_code(void *var)
 int	init_infosophers(t_info *info)
 {
 	int			ind;
+	int			nbr;
 	t_philo		*philo;
+	t_philo		*walk;
 	pthread_t	nof[200];
 
 	philo = init_philo_and_mutex(info);
 	if (philo == NULL)
 		return (1);
 	ind = -1;
-	while (++ind < info->nbr_of_philo)
+	walk = philo;
+	nbr = info->nbr_of_philo;
+	// total_time();
+	while (++ind < nbr)
 	{
-		if (pthread_create(nof + ind, NULL, run_code, philo))
-			return (ft_philoclear(philo), 1);
-		philo = philo->right;
+		if (pthread_create(nof + ind, NULL, run_code, walk))
+			return (ft_philoclear(walk), 1);
+		walk = walk->right;
 	}
-	usleep(100);
-	total_time();
 	info->init = 1;
-	if (philo->nbr_of_philo != 1)
-		hypervise(philo);
+	// if (philo->nbr_of_philo != 1)
+		// hypervise(philo, info->time_to_die);
 	while (ind-- > 0)
 		pthread_join(nof[ind], NULL);
 	return (ft_philoclear(philo), 0);
@@ -111,6 +117,7 @@ int main(int ac, char **av)
 	printf("\ntime_to_eat %d", info.time_to_eat);
 	printf("\ntime_to_sleep %d\n", info.time_to_sleep);
 	init_infosophers(&info);
+	pthread_mutex_destroy(&info.dead_mutex);
 	return (0);
 }
 

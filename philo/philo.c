@@ -6,13 +6,13 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/05 13:30:05 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:33:40 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int init_info(int ac, char **av, t_info *info)
+int	init_info(int ac, char **av, t_info *info)
 {
 	info->nbr_of_philo = ft_atoi(av[1]);
 	info->time_to_die = ft_atoi(av[2]) * KILO;
@@ -27,19 +27,19 @@ int init_info(int ac, char **av, t_info *info)
 	return (0);
 }
 
-int exit_message(t_info *info, int ac)
+int	exit_message(t_info *info, int ac)
 {
 	write(2, "invalid number of philosophers\n",
-		  (info->nbr_of_philo <= 0) * 32);
+		(info->nbr_of_philo <= 0) * 32);
 	write(2, "invalid time to die\n", (info->time_to_die <= 0) * 21);
 	write(2, "invalid time to eat\n", (info->time_to_eat <= 0) * 21);
 	write(2, "invalid time to sleep\n", (info->time_to_sleep <= 0) * 23);
 	if (ac > 5)
 		write(2, "invalid number of times each philosopher must eat \n",
-			  (info->notepme <= 0) * 52);
-	return ((info->nbr_of_philo <= 0) + (info->time_to_die <= 0) +
-			(info->time_to_eat <= 0) + (info->time_to_sleep <= 0) +
-			(info->notepme <= 0) && ac > 5);
+			(info->notepme <= 0) * 52);
+	return ((info->nbr_of_philo <= 0) + (info->time_to_die <= 0)
+		+ (info->time_to_eat <= 0) + (info->time_to_sleep <= 0)
+		+ (info->notepme <= 0) && ac > 5);
 }
 
 void	*run_code(void *var)
@@ -98,9 +98,9 @@ int	init_infosophers(t_info *info)
 	return (ft_philoclear(philo), 0);
 }
 
-int main(int ac, char **av)
+int	main(int ac, char **av)
 {
-	t_info 			info;
+	t_info	info;
 
 	if (ac != 5 && ac != 6)
 		return (write(2, "invalid number of arguments\n", 28));

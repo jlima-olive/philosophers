@@ -6,15 +6,15 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 19:01:36 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/10/30 04:26:12 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:34:36 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-int better_usleep(t_philo *philo, long time_to_sleep)
+int	better_usleep(t_philo *philo, long time_to_sleep)
 {
-	long time;
+	long	time;
 
 	time = total_time();
 	while (total_time() - time < time_to_sleep - 10)

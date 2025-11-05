@@ -6,10 +6,11 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 13:27:05 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/05 13:27:06 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:36:48 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../philo.h"
 
 int	ft_get_nbr_len(int nbr)
 {
@@ -31,7 +32,7 @@ int	elevate(int len)
 	nbr = 1;
 	while (len--)
 		nbr *= 10;
-	return (nbr);	
+	return (nbr);
 }
 
 char	*ft_strcpy(char *dest, char *src)

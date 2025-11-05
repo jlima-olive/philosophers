@@ -6,20 +6,19 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:57:02 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/05 13:09:14 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:34:19 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-void	hypervise(t_philo *ph, long ttd, _Atomic int *init, _Atomic int *end)
+void	hypervise(t_philo *ph, long ttd, int _Atomic *init, int _Atomic *end)
 {
 	usleep(200);
 	*init = 1;
 	usleep(ttd - 999);
 	while (*end != ph->nbr_of_philo)
 	{
-		// printf("|%d|\n", *end);
 		if (ph->eating == 0)
 		{
 			pthread_mutex_lock(ph->dead_mutex);

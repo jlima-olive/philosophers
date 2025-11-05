@@ -6,14 +6,14 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 12:14:12 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:25:02 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:42:12 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int ft_atoi(const char *str)
+int	ft_atoi(const char *str)
 {
-	int sign;
-	int num;
+	int	sign;
+	int	num;
 
 	sign = 1;
 	num = 0;
@@ -32,11 +32,3 @@ int ft_atoi(const char *str)
 	}
 	return (num);
 }
-
-// int main()
-// {
-// 	char * str = "  \n\t\v\r2147483648";
-// 	printf("Og return %d\n", atoi(str));
-// 	printf("My return %d", ft_atoi(str));
-
-// }

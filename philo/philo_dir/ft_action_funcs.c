@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/05 13:35:28 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:37:55 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	ft_strlen(char *str)
 int	any_dead(t_philo *philo)
 {
 	int	ret;
-	
+
 	pthread_mutex_lock(philo->dead_mutex);
 	ret = *philo->dead;
 	pthread_mutex_unlock(philo->dead_mutex);
@@ -60,8 +60,6 @@ int	go_eat(t_philo *philo)
 
 int	go_sleep(t_philo *philo)
 {
-	// if (philo->nbr % 2)
-		// usleep(100);
 	pthread_mutex_lock(philo->dead_mutex);
 	if (*philo->dead == 0)
 	{
@@ -75,7 +73,7 @@ int	go_sleep(t_philo *philo)
 	return (0);
 }
 
-int go_think(t_philo *philo)
+int	go_think(t_philo *philo)
 {
 	pthread_mutex_lock(philo->dead_mutex);
 	if (*philo->dead == 0)
@@ -85,7 +83,5 @@ int go_think(t_philo *philo)
 	}
 	else
 		return (pthread_mutex_unlock(philo->dead_mutex), 1);
-	// if (better_usleep(philo, KILO))
-		// return (1);
 	return (0);
 }

@@ -6,15 +6,15 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/22 12:14:12 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/09/11 18:25:03 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:41:28 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-float ft_atof(const char *str)
+float	ft_atof(const char *str)
 {
-	int sign;
-	int loop;
-	float num;
+	int		sign;
+	int		loop;
+	float	num;
 
 	loop = 0;
 	sign = 1;

@@ -6,44 +6,16 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/05 12:41:26 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:41:11 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-t_philo *ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
-{
-	t_philo *ph;
-
-	ph = malloc(sizeof(t_philo));
-	if (ph == NULL)
-		return (NULL);
-	if (pthread_mutex_init(&ph->holder_spoon1, NULL))
-		return (free(ph), NULL);
-	if (pthread_mutex_init(&ph->gettime, NULL))
-		return (pthread_mutex_destroy(&ph->holder_spoon1), free(ph), NULL);
-	ph->spoon1 = &ph->holder_spoon1;
-	ph->right = right;
-	ph->left = left;
-	ph->nbr = nbr;
-	ph->nbr_of_philo = info->nbr_of_philo;
-	ph->time_to_die = info->time_to_die;
-	ph->time_to_eat = info->time_to_eat;
-	ph->time_to_sleep = info->time_to_sleep;
-	ph->notepme = info->notepme;
-	ph->dead_mutex = &info->dead_mutex;
-	ph->end_sim = &info->end_sim;
-	ph->dead = &info->dead;
-	ph->init = &info->init;
-	ph->eating = 0;
-	return (ph);
-}
-
-void ft_philoclear(t_philo *philo)
+void	ft_philoclear(t_philo *philo)
 {
 	if (philo == NULL)
-		return;
+		return ;
 	if (philo->nbr_of_philo == 1)
 	{
 		pthread_mutex_destroy(philo->spoon1);
@@ -56,7 +28,6 @@ void ft_philoclear(t_philo *philo)
 		pthread_mutex_destroy(philo->spoon2);
 	else
 		pthread_mutex_destroy(philo->spoon1);
-	// printf("clear %d\n", philo->nbr);
 	free(philo);
 }
 
@@ -64,7 +35,6 @@ void	last_cicle(t_philo *philo)
 {
 	philo->times_ate = 0;
 	philo->spoon2 = philo->left->spoon1;
-	// printf("cicle %d\n", philo->nbr);
 	if (philo->nbr != philo->nbr_of_philo)
 		last_cicle(philo->left);
 }
@@ -82,12 +52,11 @@ void	reverse_forks(t_philo *philo)
 {
 	if (philo->nbr % 2)
 		ft_ult_swap(&philo->spoon1, &philo->spoon2);
-	// printf("swap %d\n", philo->nbr);
 	if (philo->nbr != philo->nbr_of_philo)
 		reverse_forks(philo->left);
 }
 
-t_philo *init_philo_and_mutex(t_info *info)
+t_philo	*init_philo_and_mutex(t_info *info)
 {
 	t_philo	*philo;
 	t_philo	*head;

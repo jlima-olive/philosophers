@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 13:35:38 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/05 13:35:52 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:37:20 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	grab_spoon(t_philo *philo)
 	return (0);
 }
 
-void drop_spoon(t_philo *philo)
+void	drop_spoon(t_philo *philo)
 {
 	pthread_mutex_unlock(philo->spoon1);
 	pthread_mutex_unlock(philo->spoon2);

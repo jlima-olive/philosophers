@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 14:24:31 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/04 15:49:18 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:00:52 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ int init_info(int ac, char **av, t_info *info)
 		info->notepme = ft_atoi(av[5]);
 	info->init = 0;
 	info->dead = 0;
+	info->end_sim = 0;
 	return (0);
 }
 
@@ -61,11 +62,9 @@ void	*run_code(void *var)
 		usleep(200);
 	while (1)
 	{
-		if (go_eat(philo))
+		if (go_eat(philo) || *philo->end_sim == philo->notepme)
 			return (NULL);
-		if (go_sleep(philo))
-			return (NULL);
-		if (go_think(philo))
+		if (go_think(philo) || go_sleep(philo))
 			return (NULL);
 	}
 	return (NULL);
@@ -92,10 +91,8 @@ int	init_infosophers(t_info *info)
 			return (ft_philoclear(walk), 1);
 		walk = walk->right;
 	}
-	usleep(200);
-	info->init = 1;
 	if (philo->nbr_of_philo != 1)
-		hypervise(philo, info->time_to_die);
+		hypervise(philo, info->time_to_die, &info->init, &info->end_sim);
 	while (ind-- > 0)
 		pthread_join(nof[ind], NULL);
 	return (ft_philoclear(philo), 0);
@@ -113,18 +110,7 @@ int main(int ac, char **av)
 		return (1);
 	if (pthread_mutex_init(&info.dead_mutex, NULL))
 		return (1);
-	printf("\nnbr_of_philo %d", info.nbr_of_philo);
-	printf("\ntime_to_die %d", info.time_to_die);
-	printf("\ntime_to_eat %d", info.time_to_eat);
-	printf("\ntime_to_sleep %d\n", info.time_to_sleep);
 	init_infosophers(&info);
 	pthread_mutex_destroy(&info.dead_mutex);
 	return (0);
 }
-
-/* 	printf("nbr_of_philo:%d\n", info.nbr_of_philo);
-	printf("time_to_die:%d\n", info.time_to_die / KILO);
-	printf("time_to_eat:%d\n", info.time_to_eat / KILO);
-	printf("time_to_sleep:%d\n", info.time_to_sleep / KILO);
-	printf("notepme:%d\n", info.notepme);
-	printf("\nstarting now\n"); */

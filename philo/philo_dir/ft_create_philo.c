@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/25 16:57:41 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/04 14:44:35 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 12:41:26 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,11 @@ t_philo *ft_philonew(t_philo *left, t_philo *right, int nbr, t_info *info)
 	ph->time_to_eat = info->time_to_eat;
 	ph->time_to_sleep = info->time_to_sleep;
 	ph->notepme = info->notepme;
-	ph->dead = &info->dead;
 	ph->dead_mutex = &info->dead_mutex;
-	ph->eating = 0;
+	ph->end_sim = &info->end_sim;
+	ph->dead = &info->dead;
 	ph->init = &info->init;
-	ph->swi = 0;
-	// printf("number %d\n", ph->nbr);
+	ph->eating = 0;
 	return (ph);
 }
 

@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 18:59:13 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/04 15:29:12 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:11:09 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,8 @@ int	go_eat(t_philo *philo)
 	pthread_mutex_unlock(&philo->gettime);
 	philo->eating = 0;
 	philo->times_ate++;
+	if (philo->times_ate == philo->notepme)
+		(*philo->end_sim)++;
 	return (0);
 }
 

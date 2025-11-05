@@ -6,7 +6,7 @@
 /*   By: jlima-so <jlima-so@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/29 20:19:47 by jlima-so          #+#    #+#             */
-/*   Updated: 2025/11/05 12:56:29 by jlima-so         ###   ########.fr       */
+/*   Updated: 2025/11/05 13:26:28 by jlima-so         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,5 +96,6 @@ void	use_single_syscal(int time, int nbr, char *msg);
 
 int		init_info(int ac, char **av, t_info *info);
 int		exit_message(t_info *info, int ac);
+int		ft_strlen(char *str);
 
 #endif
